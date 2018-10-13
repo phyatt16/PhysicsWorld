@@ -66,6 +66,6 @@ void PhysicsWorld::simulate_one_timestep(float dt)
         mObjects[i]->position.floor(-mWorldCubeSize + mObjects[i]->radius);
         mObjects[i]->position.ceil(mWorldCubeSize - mObjects[i]->radius);
 
-        std::cout<<"Object: "<<i<<"  Position: "<<mObjects[i]->position.x<<"  "<<mObjects[i]->position.y<<"  "<<mObjects[i]->position.z<<std::endl;
+        //std::cout<<"Object: "<<i<<"  Position: "<<mObjects[i]->position.x<<"  "<<mObjects[i]->position.y<<"  "<<mObjects[i]->position.z<<std::endl;
     }
 }
