@@ -6,7 +6,7 @@ class PhysicsSphere
 {
 public:
     PhysicsSphere();
-    float mass{0.f};
+    float mass{1.f};
     float radius{0.f};
     float dragCoefficient{0.5f};
     PhysicsVector position{0.f,0.f,0.f};
