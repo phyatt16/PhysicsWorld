@@ -82,8 +82,9 @@ void PhysicsWorld::simulate_one_timestep(float dt)
         //PhysicsVector dragForce{calculate_drag_force_on_object(mObjects[i])};
 
         //PhysicsVector acceleration{g + dragForce*(1.f/mObjects[i]->mass)};
-        PhysicsVector acceleration{g);
-        mObjects[i]->velocity = mObjects[i]->velocity + acceleration*dt;
+        //PhysicsVector acceleration{g};
+        //mObjects[i]->velocity = mObjects[i]->velocity + acceleration*dt;
+        mObjects[i]->velocity = mObjects[i]->velocity + g*dt;
         mObjects[i]->position = mObjects[i]->position + mObjects[i]->velocity*dt;
 
         detect_and_simulate_wall_collision(mObjects[i]);
