@@ -4,7 +4,6 @@
 
 PhysicsWorld::PhysicsWorld()
 {
-
 }
 
 PhysicsWorld::~PhysicsWorld()
