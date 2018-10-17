@@ -87,7 +87,27 @@ void PhysicsWorld::simulate_one_timestep(float dt)
         mObjects[i]->velocity = mObjects[i]->velocity + g*dt;
         mObjects[i]->position = mObjects[i]->position + mObjects[i]->velocity*dt;
 
-        detect_and_simulate_wall_collision(mObjects[i]);
+        if(fabs(mObject[i]->position.x) > mWorldCubeSize - mObject[i]->radius)
+        {
+            mObject[i]->velocity.x = -mObject[i]->velocity.x;
+            mObject[i]->velocity = mObject[i]->velocity*mObject[i]->mCoefficientOfRestitution;
+
+        }
+        if(fabs(mObject[i]->position.y) > mWorldCubeSize - mObject[i]->radius)
+        {
+            mObject[i]->velocity.y = -mObject[i]->velocity.y;
+            mObject[i]->velocity = mObject[i]->velocity*mObject[i]->mCoefficientOfRestitution;
+        }
+        if(fabs(mObject[i]->position.z) > mWorldCubeSize - mObject[i]->radius)
+        {
+            mObject[i]->velocity.z = -mObject[i]->velocity.z;
+            mObject[i]->velocity = mObject[i]->velocity*mObject[i]->mCoefficientOfRestitution;
+        }
+
+        mObject[i]->position.floor(-mWorldCubeSize + mObject[i]->radius);
+        mObject[i]->position.ceil(mWorldCubeSize - mObject[i]->radius);
+
+        //detect_and_simulate_wall_collision(mObjects[i]);
 
     }
 }
