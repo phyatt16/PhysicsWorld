@@ -72,6 +72,12 @@ PhysicsVector PhysicsWorld::calculate_drag_force_on_object(PhysicsSphere * objec
     float dragForceMagnitude = 0.5 * fluidDensity * pow(object->velocity.norm(),2.f) * object->dragCoefficient * pi * pow(object->radius,2.f);
     PhysicsVector dragForce{ -(object->velocity)*(1.f/object->velocity.norm()) * dragForceMagnitude};
 
+    if(isnan(dragForceMagnitude))
+    {
+        std::cout<<"dragForceMagnitude is nan"<<std::endl;
+    }
+
+
     return dragForce;
 }
 
@@ -83,14 +89,6 @@ void PhysicsWorld::simulate_one_timestep(float dt)
 
         PhysicsVector acceleration{g + dragForce*(1.f/mObjects[i]->mass)};
 
-        if(isnan(dragForce.x))
-        {
-            std::cout<<"dragForce is nan"<<std::endl;
-        }
-        if(isnan((1.f/mObjects[i]->mass)))
-        {
-            std::cout<<"1/mass is nan"<<std::endl;
-        }
 
         mObjects[i]->velocity = mObjects[i]->velocity + acceleration*dt;
         mObjects[i]->position = mObjects[i]->position + mObjects[i]->velocity*dt;
