@@ -25,6 +25,11 @@ void PhysicsWorld::add_object_to_world(PhysicsSphere* object)
     mNumberOfObjects++;
 }
 
+void PhysicsWorld::set_fluid_density(float density)
+{
+    fluidDensity = density;
+}
+
 PhysicsSphere * PhysicsWorld::get_object(int objectId)
 {
     if(objectId <= mNumberOfObjects)
