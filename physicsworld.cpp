@@ -70,7 +70,7 @@ PhysicsVector PhysicsWorld::calculate_drag_force_on_object(PhysicsSphere * objec
 {
     float pi{3.14159};
     float dragForceMagnitude = 0.5 * fluidDensity * pow(object->velocity.norm(),2.f) * object->dragCoefficient * pi * pow(object->radius,2.f);
-    PhysicsVector dragForce{ -object->velocity * dragForceMagnitude};
+    PhysicsVector dragForce{ -(object->velocity)*(1/object->velocity.norm()) * dragForceMagnitude};
 
     return dragForce;
 }
