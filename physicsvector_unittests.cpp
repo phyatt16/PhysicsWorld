@@ -53,5 +53,19 @@ TEST(GivenPhysicsVector,WhenUsingCeilFunction_CeilFunctionWorks)
     EXPECT_EQ(2.f,vec.z);
 }
 
+TEST(GivenPhysicsVector,WhenCalculatingNorm_NormIsCorrect)
+{
+    PhysicsVector vec1{-1.f,0.f,0.f};
+    float goalNorm1{1.f};
+
+    EXPECT_EQ(goalNorm1,vec1.norm());
+
+    PhysicsVector vec2{-1.f,2.f,-2.f};
+    float goalNorm2{3.f};
+
+    EXPECT_EQ(goalNorm2,vec2.norm());
+
+}
+
 
 

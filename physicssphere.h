@@ -6,11 +6,12 @@ class PhysicsSphere
 {
 public:
     PhysicsSphere();
-    float mass{0};
-    float radius{0};
-    PhysicsVector position{0,0,0};
-    PhysicsVector velocity{0,0,0};
-    float mCoefficientOfRestitution{.8};
+    float mass{0.f};
+    float radius{0.f};
+    float dragCoefficient{0.5f};
+    PhysicsVector position{0.f,0.f,0.f};
+    PhysicsVector velocity{0.f,0.f,0.f};
+    float mCoefficientOfRestitution{.8f};
 
 private:
 

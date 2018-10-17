@@ -11,6 +11,7 @@ public:
     PhysicsWorld();
     ~PhysicsWorld();
     PhysicsVector g;
+    float mFluidDensity{0.f};
     int get_number_of_objects();
     void add_object_to_world(PhysicsSphere*);
     PhysicsSphere * get_object(int objectId);
@@ -19,6 +20,8 @@ private:
     int mNumberOfObjects{0};
     std::vector<PhysicsSphere *> mObjects;
     float mWorldCubeSize{5};
+    void detect_and_simulate_wall_collision(PhysicsSphere *);
+    PhysicsVector calculate_drag_force_on_object(PhysicsSphere *);
 };
 
 #endif // PHYSICSWORLD_H

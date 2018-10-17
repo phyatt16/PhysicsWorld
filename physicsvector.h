@@ -1,7 +1,6 @@
 #ifndef PHYSICSVECTOR_H
 #define PHYSICSVECTOR_H
 
-
 class PhysicsVector
 {
 public:
@@ -9,6 +8,7 @@ public:
     PhysicsVector(float x_, float y_, float z_);
     void floor(float minValue);
     void ceil(float maxValue);
+    float norm();
     float x;
     float y;
     float z;
@@ -33,10 +33,12 @@ inline PhysicsVector operator*(const PhysicsVector &v1, const float &k)
     return PhysicsVector{v1.x*k, v1.y*k, v1.z*k};
 }
 
-//inline PhysicsVector operator-(const PhysicsVector &v1)
-//{
-//    return PhysicsVector{-v1.x, -v1.y, -v1.z};
-//}
+inline PhysicsVector operator-(const PhysicsVector &v)
+{
+    return PhysicsVector{-v.x,-v.y,-v.z};
+}
+
+
 
 
 

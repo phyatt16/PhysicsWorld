@@ -1,4 +1,5 @@
 #include "physicsvector.h"
+#include <math.h>
 
 PhysicsVector::PhysicsVector()
 {
@@ -25,4 +26,9 @@ void PhysicsVector::ceil(float maxValue)
     if(x>maxValue){x=maxValue;}
     if(y>maxValue){y=maxValue;}
     if(z>maxValue){z=maxValue;}
+}
+
+float PhysicsVector::norm()
+{
+    return sqrt(pow(x,2.f) + pow(y,2.f) + pow(z,2.f));
 }
