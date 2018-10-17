@@ -79,12 +79,11 @@ void PhysicsWorld::simulate_one_timestep(float dt)
 {
     for(int i{0}; i<mNumberOfObjects; i++)
     {
-        //PhysicsVector dragForce{calculate_drag_force_on_object(mObjects[i])};
+        PhysicsVector dragForce{calculate_drag_force_on_object(mObjects[i])};
 
-        //PhysicsVector acceleration{g + dragForce*(1.f/mObjects[i]->mass)};
-        //PhysicsVector acceleration{g};
-        //mObjects[i]->velocity = mObjects[i]->velocity + acceleration*dt;
-        mObjects[i]->velocity = mObjects[i]->velocity + g*dt;
+        PhysicsVector acceleration{g + dragForce*(1.f/mObjects[i]->mass)};
+        mObjects[i]->velocity = mObjects[i]->velocity + acceleration*dt;
+        //mObjects[i]->velocity = mObjects[i]->velocity + g*dt;
         mObjects[i]->position = mObjects[i]->position + mObjects[i]->velocity*dt;
 
 
