@@ -72,9 +72,13 @@ PhysicsVector PhysicsWorld::calculate_drag_force_on_object(PhysicsSphere * objec
     float dragForceMagnitude = 0.5 * fluidDensity * pow(object->velocity.norm(),2.f) * object->dragCoefficient * pi * pow(object->radius,2.f);
     PhysicsVector dragForce{ -(object->velocity)*(1.f/object->velocity.norm()) * dragForceMagnitude};
 
-    if(isnan(dragForceMagnitude))
+    if(isnan(pow(object->velocity.norm(),2.f)))
     {
-        std::cout<<"dragForceMagnitude is nan"<<std::endl;
+        std::cout<<"first squared term is nan"<<std::endl;
+    }
+    if(isnan(pow(object->radius,2.f)))
+    {
+        std::cout<<"first squared term is nan"<<std::endl;
     }
 
 
