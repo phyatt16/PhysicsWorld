@@ -11,7 +11,7 @@ public:
     PhysicsWorld();
     ~PhysicsWorld();
     PhysicsVector g;
-    float mFluidDensity{0.f};
+    float fluidDensity{0.f};
     int get_number_of_objects();
     void add_object_to_world(PhysicsSphere*);
     PhysicsSphere * get_object(int objectId);

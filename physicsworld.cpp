@@ -65,7 +65,7 @@ void PhysicsWorld::detect_and_simulate_wall_collision(PhysicsSphere * object)
 PhysicsVector PhysicsWorld::calculate_drag_force_on_object(PhysicsSphere * object)
 {
     float pi{3.14159};
-    float dragForceMagnitude = 0.5 * mFluidDensity * pow(object->velocity.norm(),2.f) * object->dragCoefficient * pi * pow(object->radius,2.f);
+    float dragForceMagnitude = 0.5 * fluidDensity * pow(object->velocity.norm(),2.f) * object->dragCoefficient * pi * pow(object->radius,2.f);
     PhysicsVector dragForce{ -object->velocity * dragForceMagnitude};
 
     return dragForce;
