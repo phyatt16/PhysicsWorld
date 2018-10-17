@@ -11,7 +11,6 @@ public:
     PhysicsWorld();
     ~PhysicsWorld();
     PhysicsVector g;
-    float fluidDensity{0.f};
     int get_number_of_objects();
     void add_object_to_world(PhysicsSphere*);
     void set_fluid_density(float);
@@ -19,6 +18,7 @@ public:
     void simulate_one_timestep(float dt);
 private:
     int mNumberOfObjects{0};
+    float fluidDensity{0.f};
     std::vector<PhysicsSphere *> mObjects;
     float mWorldCubeSize{5};
     void detect_and_simulate_wall_collision(PhysicsSphere *);
