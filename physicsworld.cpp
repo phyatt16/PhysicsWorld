@@ -87,6 +87,8 @@ void PhysicsWorld::simulate_one_timestep(float dt)
         mObjects[i]->velocity = mObjects[i]->velocity + g*dt;
         mObjects[i]->position = mObjects[i]->position + mObjects[i]->velocity*dt;
 
+
+        /*
         if(fabs(mObjects[i]->position.x) > mWorldCubeSize - mObjects[i]->radius)
         {
             mObjects[i]->velocity.x = -mObjects[i]->velocity.x;
@@ -106,8 +108,9 @@ void PhysicsWorld::simulate_one_timestep(float dt)
 
         mObjects[i]->position.floor(-mWorldCubeSize + mObjects[i]->radius);
         mObjects[i]->position.ceil(mWorldCubeSize - mObjects[i]->radius);
+        */
 
-        //detect_and_simulate_wall_collision(mObjects[i]);
+        detect_and_simulate_wall_collision(mObjects[i]);
 
     }
 }
