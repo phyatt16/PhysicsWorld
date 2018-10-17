@@ -82,13 +82,19 @@ void PhysicsWorld::simulate_one_timestep(float dt)
         PhysicsVector dragForce{calculate_drag_force_on_object(mObjects[i])};
 
         PhysicsVector acceleration{g + dragForce*(1.f/mObjects[i]->mass)};
+
+        if(isnan(dragForce.x))
+        {
+            std::cout<<"dragForce is nan"<<std::endl;
+        }
+        if(isnan((1.f/mObjects[i]->mass)))
+        {
+            std::cout<<"1/mass is nan"<<std::endl;
+        }
+
         mObjects[i]->velocity = mObjects[i]->velocity + acceleration*dt;
         mObjects[i]->position = mObjects[i]->position + mObjects[i]->velocity*dt;
 
-        if(isnan(acceleration.x))
-        {
-            std::cout<<"acceleration is nan"<<std::endl;
-        }
 
         detect_and_simulate_wall_collision(mObjects[i]);
     }
