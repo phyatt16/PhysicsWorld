@@ -89,8 +89,16 @@ void PhysicsWorld::simulate_one_timestep(float dt)
 
         PhysicsVector acceleration{g + dragForce*(1.f/mObjects[i]->mass)};
 
+        if(!isnan(acceleration.x) && !isnan(acceleration.y) && !isnan(acceleration.z))
+        {
+            mObjects[i]->velocity = mObjects[i]->velocity + acceleration*dt;
+        }
+        else
+        {
+            float velocityDampingTerm{.9};
+            mObjects[i]->velocity = mObjects[i]->velocity * velocityDampingTerm;
+        }
 
-        mObjects[i]->velocity = mObjects[i]->velocity + acceleration*dt;
         mObjects[i]->position = mObjects[i]->position + mObjects[i]->velocity*dt;
 
 
