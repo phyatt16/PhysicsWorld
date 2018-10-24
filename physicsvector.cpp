@@ -32,3 +32,8 @@ float PhysicsVector::norm()
 {
     return sqrt(pow(x,2.f) + pow(y,2.f) + pow(z,2.f));
 }
+
+float PhysicsVector::dot(PhysicsVector &vec)
+{
+    return this->x*vec.x + this->y*vec.y + this->z*vec.z;
+}

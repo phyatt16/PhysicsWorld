@@ -28,16 +28,6 @@ add_executable(PhysicsVector_UnitTest
 
 target_link_libraries(PhysicsVector_UnitTest gtest gtest_main)
 
-add_executable(PhysicsSphere_UnitTest
-    physicssphere_unittests.cpp
-    physicsvector.cpp
-    physicsvector.h
-    physicssphere.cpp
-    physicssphere.h
-    )
-
-target_link_libraries(PhysicsSphere_UnitTest gtest gtest_main)
-
 add_executable(PhysicsWorld_UnitTest
     physicsworld_unittests.cpp
     physicsworld.cpp

@@ -67,5 +67,20 @@ TEST(GivenPhysicsVector,WhenCalculatingNorm_NormIsCorrect)
 
 }
 
+TEST(GivenPhysicsVectors,WhenCalculatingDotProduct_DotProductIsCorrect)
+{
+    PhysicsVector vec1{-1.f,1.f,0.f};
+    PhysicsVector vec2{1.f,-8.f,3.f};
+    PhysicsVector vec3{0.f,0.f,3.f};
+
+    float expectedDotProduct{0};
+
+    expectedDotProduct = vec1.x*vec2.x + vec1.y*vec2.y + vec1.z*vec2.z;
+
+    EXPECT_EQ(expectedDotProduct,vec1.dot(vec2));
+    EXPECT_EQ(0,vec1.dot(vec3));
+
+}
+
 
 

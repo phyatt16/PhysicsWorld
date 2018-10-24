@@ -90,10 +90,15 @@ void PhysicsWorld::detect_and_simulate_object_collision(PhysicsSphere * object)
     }
 }
 
-void PhysicsWorld::resolve_object_collision(PhysicsSphere * primaryObject,PhysicsSphere * secondaryObject,PhysicsVector &vectorFromPrimaryToSecondary,float intersectionDistance)
+void PhysicsWorld::resolve_object_collision(PhysicsSphere * object1,PhysicsSphere * object2,PhysicsVector &vectorFromOneToTwo,float intersectionDistance)
 {
-    primaryObject->position = primaryObject->position + -vectorFromPrimaryToSecondary*intersectionDistance;
-    secondaryObject->position = secondaryObject->position + vectorFromPrimaryToSecondary*intersectionDistance;
+    object1->position = object1->position + -vectorFromOneToTwo*intersectionDistance;
+    object2->position = object2->position + vectorFromOneToTwo*intersectionDistance;
+
+    PhysicsVector velocityOfOneRelativeToTwo{object1->velocity - object2->velocity};
+
+    object1->velocity = object1->mCoefficientOfRestitution*(object1->velocity - 2*object2->mass/(object1->mass+object2->mass) * velocityOfOneRelativeToTwo.dot(vectorFromOneToTwo)*1/(powf(vectorFromOneToTwo.norm(),2.0)) * vectorFromOneToTwo);
+    object2->velocity = object2->mCoefficientOfRestitution*(object2->velocity - 2*object1->mass/(object1->mass+object2->mass) * velocityOfOneRelativeToTwo.dot(vectorFromOneToTwo)*1/(powf(vectorFromOneToTwo.norm(),2.0)) * -vectorFromOneToTwo);
 }
 
 PhysicsVector PhysicsWorld::calculate_drag_force_on_object(PhysicsSphere * object)
