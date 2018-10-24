@@ -22,6 +22,8 @@ private:
     std::vector<PhysicsSphere *> mObjects;
     float mWorldCubeSize{5};
     void detect_and_simulate_wall_collision(PhysicsSphere *);
+    void detect_and_simulate_object_collision(PhysicsSphere *);
+    void resolve_object_collision(PhysicsSphere *,PhysicsSphere *,PhysicsVector &vectorFromPrimaryToSecondary,float intersectionDistance);
     PhysicsVector calculate_drag_force_on_object(PhysicsSphere *);
 };
 

@@ -23,6 +23,9 @@ void PhysicsWorld::add_object_to_world(PhysicsSphere* object)
 {
     mObjects.push_back(object);
     mNumberOfObjects++;
+    detect_and_simulate_object_collision(object);
+    detect_and_simulate_wall_collision(object);
+
 }
 
 void PhysicsWorld::set_fluid_density(float density)
@@ -66,6 +69,33 @@ void PhysicsWorld::detect_and_simulate_wall_collision(PhysicsSphere * object)
     object->position.ceil(mWorldCubeSize - object->radius);
 }
 
+void PhysicsWorld::detect_and_simulate_object_collision(PhysicsSphere * object)
+{
+    PhysicsVector PrimaryObjectPosition{object->position};
+    for(int i{0}; i<this->get_number_of_objects(); i++)
+    {
+        if(this->get_object(i) != object)
+        {
+            PhysicsSphere * secondaryObject{this->get_object(i)};
+            PhysicsVector vectorBetweenObjects{object->position - secondaryObject->position};
+
+            float sumOfRadii{object->radius + secondaryObject->radius};
+
+            if(vectorBetweenObjects.norm() < sumOfRadii)
+            {
+                float intersectionDistance{vectorBetweenObjects.norm()-sumOfRadii};
+                resolve_object_collision(object,secondaryObject,vectorBetweenObjects,intersectionDistance);
+            }
+        }
+    }
+}
+
+void PhysicsWorld::resolve_object_collision(PhysicsSphere * primaryObject,PhysicsSphere * secondaryObject,PhysicsVector &vectorFromPrimaryToSecondary,float intersectionDistance)
+{
+    primaryObject->position = primaryObject->position + -vectorFromPrimaryToSecondary*intersectionDistance;
+    secondaryObject->position = secondaryObject->position + vectorFromPrimaryToSecondary*intersectionDistance;
+}
+
 PhysicsVector PhysicsWorld::calculate_drag_force_on_object(PhysicsSphere * object)
 {
     float pi{3.14159};
@@ -102,6 +132,7 @@ void PhysicsWorld::simulate_one_timestep(float dt)
         mObjects[i]->position = mObjects[i]->position + mObjects[i]->velocity*dt;
 
 
+        detect_and_simulate_object_collision(mObjects[i]);
         detect_and_simulate_wall_collision(mObjects[i]);
     }
 }

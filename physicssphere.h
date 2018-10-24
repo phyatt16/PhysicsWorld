@@ -8,7 +8,7 @@ public:
     PhysicsSphere();
     float mass{1.f};
     float radius{0.f};
-    float dragCoefficient{0.5f};
+    float dragCoefficient{0.25f};
     PhysicsVector position{0.f,0.f,0.f};
     PhysicsVector velocity{0.f,0.f,0.f};
     float mCoefficientOfRestitution{.8f};

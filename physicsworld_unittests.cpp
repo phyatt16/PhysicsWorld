@@ -23,6 +23,35 @@ protected:
     PhysicsWorld world;
 };
 
+class PhysicsWorldWithSpheresAndGravityTest : public ::testing::Test
+{
+protected:
+    void SetUp()
+    {
+        PhysicsVector gravityVector{0,0,-9.81};
+        world.g = gravityVector;
+
+        PhysicsSphere *sphere = new PhysicsSphere;
+        PhysicsVector sphereVelocity{1,1,1};
+        PhysicsVector spherePosition{1,2,3};
+        sphere->radius = 1;
+        sphere->mass = 1;
+        sphere->velocity = sphereVelocity;
+        sphere->position = spherePosition;
+        world.add_object_to_world(sphere);
+
+        PhysicsSphere *sphere2 = new PhysicsSphere;
+        PhysicsVector sphere2Velocity{-1,-1,-1};
+        PhysicsVector sphere2Position{.5,2,3};
+        sphere2->radius = 1;
+        sphere2->mass = 1;
+        sphere2->velocity = sphere2Velocity;
+        sphere2->position = sphere2Position;
+        world.add_object_to_world(sphere2);
+    }
+    PhysicsWorld world;
+};
+
 TEST_F(PhysicsWorldTest,WhenInitialized_DefaultValuesAreCorrect)
 {
     EXPECT_EQ(0,world.g.x);
@@ -60,3 +89,13 @@ TEST_F(PhysicsWorldTest,WhenSimulatingOneTimeStepWithGravity_SphereHasCorrectSta
 }
 
 
+TEST_F(PhysicsWorldWithSpheresAndGravityTest,WhenMultipleSpheresAreInitializedInCollision_SpheresAreMovedToNotBeInCollision)
+{
+    PhysicsVector sphere1Position{world.get_object(0)->position};
+    PhysicsVector sphere2Position{world.get_object(1)->position};
+    float sumOfRadii{world.get_object(0)->radius + world.get_object(1)->radius};
+
+    PhysicsVector fromSphere1ToSphere2{sphere1Position-sphere2Position};
+    float distanceBetweenSpheres{fromSphere1ToSphere2.norm()};
+    EXPECT_GE(distanceBetweenSpheres,sumOfRadii);
+}
