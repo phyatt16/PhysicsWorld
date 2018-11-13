@@ -47,5 +47,11 @@ void PhysicsWorld::simulate_one_timestep(float dt)
 
         mObjects[i]->position = mObjects[i]->position + mObjects[i]->velocity*dt;
 
+        if(fabs(mObjects[i]->position.z) < 0)
+        {
+            mObjects[i]->velocity.z = -mObjects[i]->velocity.z;
+            mObjects[i]->velocity = mObjects[i]->velocity*object->mCoefficientOfRestitution;
+        }
+
     }
 }

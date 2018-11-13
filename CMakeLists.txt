@@ -24,6 +24,8 @@ add_library(${PROJECT_NAME} STATIC
     physicsbox.h
     physicsobject.cpp
     physicsobject.h
+    physicsjoint.cpp
+    physicsjoint.h
     )
 
 add_executable(PhysicsVector_UnitTest
