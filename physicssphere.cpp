@@ -3,5 +3,5 @@
 
 PhysicsSphere::PhysicsSphere()
 {
-
+    this->shape = "sphere";
 }

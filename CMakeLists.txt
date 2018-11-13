@@ -18,6 +18,12 @@ add_library(${PROJECT_NAME} STATIC
     physicsvector.h
     physicssphere.cpp
     physicssphere.h
+    physicscylinder.cpp
+    physicscylinder.h
+    physicsbox.cpp
+    physicsbox.h
+    physicsobject.cpp
+    physicsobject.h
     )
 
 add_executable(PhysicsVector_UnitTest
@@ -30,13 +36,7 @@ target_link_libraries(PhysicsVector_UnitTest gtest gtest_main)
 
 add_executable(PhysicsWorld_UnitTest
     physicsworld_unittests.cpp
-    physicsworld.cpp
-    physicsworld.h
-    physicsvector.cpp
-    physicsvector.h
-    physicssphere.cpp
-    physicssphere.h
     )
 
-target_link_libraries(PhysicsWorld_UnitTest gtest gtest_main)
+target_link_libraries(PhysicsWorld_UnitTest PhysicsWorld gtest gtest_main)
 
