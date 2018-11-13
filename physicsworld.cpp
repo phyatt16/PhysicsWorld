@@ -4,7 +4,9 @@
 
 PhysicsWorld::PhysicsWorld()
 {
-    this->g.z = -9.81;
+    this->g(0) = 0;
+    this->g(1) = 0;
+    this->g(2) = -9.81;
 }
 
 PhysicsWorld::~PhysicsWorld()
@@ -27,15 +29,13 @@ void PhysicsWorld::add_object_to_world(PhysicsObject* object)
 }
 
 
-
-
 void PhysicsWorld::simulate_one_timestep(float dt)
 {
     for(int i{0}; i<mNumberOfObjects; i++)
     {
-        PhysicsVector acceleration{g};
+        Eigen::Vector3d acceleration{g};
 
-        if(!std::isnan(acceleration.x) && !std::isnan(acceleration.y) && !std::isnan(acceleration.z))
+        if(!std::isnan(acceleration(0)) && !std::isnan(acceleration(1)) && !std::isnan(acceleration(2)))
         {
             mObjects[i]->velocity = mObjects[i]->velocity + acceleration*dt;
         }
@@ -45,13 +45,15 @@ void PhysicsWorld::simulate_one_timestep(float dt)
             mObjects[i]->velocity = mObjects[i]->velocity * velocityDampingTerm;
         }
 
-        mObjects[i]->position = mObjects[i]->position + mObjects[i]->velocity*dt;
+        mObjects[i]->pose.translation() = mObjects[i]->pose.translation() + mObjects[i]->velocity*dt;
 
-        if(fabs(mObjects[i]->position.z) < 0)
+
+        if(mObjects[i]->pose.translation()(2) <= 0)
         {
-            mObjects[i]->velocity.z = -mObjects[i]->velocity.z;
-            mObjects[i]->velocity = mObjects[i]->velocity*object->mCoefficientOfRestitution;
+            mObjects[i]->velocity(2) = -mObjects[i]->velocity(2);
+            mObjects[i]->velocity = mObjects[i]->velocity*mObjects[i]->mCoefficientOfRestitution;
         }
+        //mObjects[i]->position.floor(0);
 
     }
 }

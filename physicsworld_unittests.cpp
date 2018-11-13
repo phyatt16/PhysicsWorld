@@ -2,38 +2,14 @@
 
 #include <gtest/gtest.h>
 
-class PhysicsWorldTest : public ::testing::Test
+TEST(PhysicsWorldTest,WhenInitialized_DefaultValuesAreCorrect)
 {
-protected:
-    void SetUp()
-    {
-        PhysicsSphere *sphere = new PhysicsSphere;
-        PhysicsVector sphereVelocity{1,0,0};
-        PhysicsVector spherePosition{1,2,3};
-        sphere->radius = 1;
-        sphere->mass = 1;
-        sphere->velocity = sphereVelocity;
-        sphere->position = spherePosition;
-
-        world.add_object_to_world(sphere);
-    }
     PhysicsWorld world;
-};
-
-TEST_F(PhysicsWorldTest,WhenInitialized_DefaultValuesAreCorrect)
-{
-    EXPECT_EQ(0,world.g.x);
-    EXPECT_EQ(0,world.g.y);
-    EXPECT_EQ(-9.81f,world.g.z);
+    EXPECT_EQ(0,world.g(0));
+    EXPECT_EQ(0,world.g(1));
+    EXPECT_EQ(-9.81,world.g(2));
 }
 
-TEST_F(PhysicsWorldTest,WhenAddingObjects_WorldKeepsCountOfObjects)
-{
-    PhysicsSphere *sphere = new PhysicsSphere;
-    world.add_object_to_world(sphere);
-
-    EXPECT_EQ(2,world.get_number_of_objects());
-}
 
 TEST(PhysicsWorldUnitTest,WhenAddingDifferentObjects_TheyRetainTheirUniqueProperties)
 {
@@ -71,6 +47,29 @@ TEST(PhysicsWorldUnitTest,WhenAddingDifferentObjects_TheyRetainTheirUniqueProper
     EXPECT_EQ(4,someObject3->height);
     EXPECT_EQ(5,someObject3->width);
 
+
+}
+
+TEST(RoboticsUnitTest,WhenPuttingJointsBetweenLinks_TheyReturnRelativeTransformBetweenLinks)
+{
+    PhysicsWorld world;
+
+    PhysicsCylinder *cylinder1 = new PhysicsCylinder;
+    cylinder1->height = 1.5;
+    cylinder1->radius = .1;
+    PhysicsCylinder *cylinder2 = new PhysicsCylinder;
+    cylinder2->height = 1.5;
+    cylinder2->radius = .1;
+
+    world.add_object_to_world(cylinder1);
+    world.add_object_to_world(cylinder2);
+
+    PhysicsJoint * joint1 = new PhysicsJoint;
+    joint1->parent = cylinder1;
+    joint1->child = cylinder2;
+    joint1->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,1);
+    joint1->rotationAxis << 0, 0, 1;
+    joint1->TransformFromJointToChildCoM = Eigen::Translation3d(0,1,0) * Eigen::AngleAxisd(3.14159,Eigen::Vector3d(0,0,1));
 
 }
 

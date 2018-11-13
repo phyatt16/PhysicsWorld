@@ -4,6 +4,7 @@
 #include "physicssphere.h"
 #include "physicscylinder.h"
 #include "physicsbox.h"
+#include "physicsjoint.h"
 #include <vector>
 
 class PhysicsWorld
@@ -11,7 +12,7 @@ class PhysicsWorld
 public:
     PhysicsWorld();
     ~PhysicsWorld();
-    PhysicsVector g;
+    Eigen::Vector3d g;
     int get_number_of_objects();
     void add_object_to_world(PhysicsObject*);
 
