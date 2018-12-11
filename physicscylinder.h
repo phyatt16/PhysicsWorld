@@ -9,8 +9,8 @@ class PhysicsCylinder : public PhysicsObject
 public:
     PhysicsCylinder();
     ~PhysicsCylinder(){};
-    float height;
-    float radius;
+    double height;
+    double radius;
 };
 
 #endif // PHYSICSCYLINDER_H

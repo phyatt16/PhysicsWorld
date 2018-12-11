@@ -1,6 +1,5 @@
 #ifndef PHYSICSOBJECT_H
 #define PHYSICSOBJECT_H
-#include "physicsvector.h"
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Geometry>
@@ -13,9 +12,9 @@ public:
     virtual ~PhysicsObject(){};
     Eigen::Affine3d pose;
     Eigen::Matrix3d inertiaTensor;
-    float mass{1.f};
+    double mass{1};
     Eigen::Vector3d velocity;
-    float mCoefficientOfRestitution{.8f};
+    double mCoefficientOfRestitution{.8};
     std::string shape;
 };
 

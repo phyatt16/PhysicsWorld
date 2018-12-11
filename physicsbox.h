@@ -7,9 +7,9 @@ class PhysicsBox : public PhysicsObject
 public:
     PhysicsBox();
     ~PhysicsBox(){};
-    float length;
-    float width;
-    float height;
+    double length;
+    double width;
+    double height;
 };
 
 #endif // PHYSICSBOX_H

@@ -1,6 +1,5 @@
 #ifndef PHYSICSWORLD_H
 #define PHYSICSWORLD_H
-#include "physicsvector.h"
 #include "physicssphere.h"
 #include "physicscylinder.h"
 #include "physicsbox.h"
@@ -17,7 +16,7 @@ public:
     void add_object_to_world(PhysicsObject*);
 
     PhysicsObject * get_object(int objectId);
-    void simulate_one_timestep(float dt);
+    void simulate_one_timestep(double dt);
     std::vector<PhysicsObject *> mObjects;
 private:
     int mNumberOfObjects{0};

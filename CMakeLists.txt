@@ -14,8 +14,6 @@ ENDIF()
 add_library(${PROJECT_NAME} STATIC
     physicsworld.cpp
     physicsworld.h
-    physicsvector.cpp
-    physicsvector.h
     physicssphere.cpp
     physicssphere.h
     physicscylinder.cpp
@@ -29,14 +27,6 @@ add_library(${PROJECT_NAME} STATIC
     physicsrobot.cpp
     physicsrobot.h
     )
-
-add_executable(PhysicsVector_UnitTest
-    physicsvector_unittests.cpp
-    physicsvector.cpp
-    physicsvector.h
-    )
-
-target_link_libraries(PhysicsVector_UnitTest gtest gtest_main)
 
 add_executable(PhysicsWorld_UnitTest
     physicsworld_unittests.cpp

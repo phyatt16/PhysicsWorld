@@ -38,7 +38,7 @@ TEST(PhysicsWorldUnitTest,WhenAddingDifferentObjects_TheyRetainTheirUniqueProper
     PhysicsCylinder* someObject2 = dynamic_cast<PhysicsCylinder*>(world.mObjects[1]);
 
     EXPECT_EQ("cylinder",someObject2->shape);
-    EXPECT_EQ(.1f,someObject2->radius);
+    EXPECT_EQ(.1,someObject2->radius);
     EXPECT_EQ(1.5,someObject2->height);
 
     PhysicsBox* someObject3 = dynamic_cast<PhysicsBox*>(world.mObjects[2]);

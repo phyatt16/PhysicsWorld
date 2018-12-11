@@ -7,7 +7,7 @@ class PhysicsSphere : public PhysicsObject
 public:
     PhysicsSphere();
     ~PhysicsSphere(){};
-    float radius{0.f};
+    double radius{0};
 
 private:
 

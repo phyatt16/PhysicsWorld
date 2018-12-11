@@ -29,7 +29,7 @@ void PhysicsWorld::add_object_to_world(PhysicsObject* object)
 }
 
 
-void PhysicsWorld::simulate_one_timestep(float dt)
+void PhysicsWorld::simulate_one_timestep(double dt)
 {
     for(int i{0}; i<mNumberOfObjects; i++)
     {
@@ -41,7 +41,7 @@ void PhysicsWorld::simulate_one_timestep(float dt)
         }
         else
         {
-            float velocityDampingTerm{.9};
+            double velocityDampingTerm{.9};
             mObjects[i]->velocity = mObjects[i]->velocity * velocityDampingTerm;
         }
 
