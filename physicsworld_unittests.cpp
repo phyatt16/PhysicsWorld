@@ -1,4 +1,5 @@
 #include "physicsworld.h"
+#include "physicsrobot.h"
 
 #include <gtest/gtest.h>
 
@@ -67,14 +68,17 @@ TEST(RoboticsUnitTest,WhenPuttingJointsBetweenLinks_TheyReturnRelativeTransformB
     PhysicsJoint * joint1 = new PhysicsJoint;
     joint1->parent = cylinder1;
     joint1->child = cylinder2;
-    joint1->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,1);
     joint1->rotationAxis << 0, 0, 1;
-    joint1->TransformFromJointToChildCoM = Eigen::Translation3d(0,1,0) * Eigen::AngleAxisd(3.14159,Eigen::Vector3d(0,0,1));
+    joint1->TransformFromJointToChildCoM = Eigen::Translation3d(0,cylinder2->height/2.0,0);
+    joint1->TransformFromJointToChildEnd = Eigen::Translation3d(0,cylinder2->height,0);
 
+    joint1->set_joint_angle(3.14159/2.0);
 
-    Eigen::Affine3d ExpectedTransformation = Eigen::Translation3d(0,1,1) * Eigen::AngleAxisd(3.14159,Eigen::Vector3d(0,0,1));
+    Eigen::Affine3d ExpectedTransformation = Eigen::AngleAxisd(3.14159/2.0,Eigen::Vector3d(0,0,1))*Eigen::Translation3d(0,1.5,0);
+    Eigen::Affine3d actualTransformation = joint1->get_transform_from_parent_end_to_child_end();
 
-    Eigen::Affine3d actualTransformation = joint1->get_transform_from_parent_CoM_to_child_CoM();
+    //std::cout<<actualTransformation.matrix()<<std::endl;
+    //std::cout<<ExpectedTransformation.matrix()<<std::endl;
 
     EXPECT_EQ(ExpectedTransformation(0,0),actualTransformation(0,0));
     EXPECT_EQ(ExpectedTransformation(1,0),actualTransformation(1,0));
@@ -105,36 +109,59 @@ TEST(RoboticsUnitTest,WhenCreatingRobotAndGivingJointAngles_RobotCanDoForwardKin
     box->height = 1.0;
     box->length = 1.0;
     box->width = 1.0;
-
-    robot->base = box;
+    robot.base = box;
 
     PhysicsCylinder *cylinder1 = new PhysicsCylinder;
     cylinder1->height = 1.0;
     cylinder1->radius = .1;
     world.add_object_to_world(cylinder1);
-
     PhysicsJoint * joint1 = new PhysicsJoint;
     joint1->parent = robot.base;
     joint1->child = cylinder1;
-    joint1->TransformFromParentCoMToJoint = Eigen::Translation3d(0,robot->width/2.0,);
     joint1->rotationAxis << 1, 0, 0;
     joint1->TransformFromJointToChildCoM = Eigen::Translation3d(0,cylinder1->height/2.0,0) * Eigen::AngleAxisd(0,Eigen::Vector3d(0,0,1));
-
+    joint1->TransformFromJointToChildEnd = Eigen::Translation3d(0,cylinder1->height,0) * Eigen::AngleAxisd(0,Eigen::Vector3d(0,0,1));
     robot.add_joint(joint1);
 
     PhysicsCylinder *cylinder2 = new PhysicsCylinder;
     cylinder2->height = 1.0;
     cylinder2->radius = .1;
     world.add_object_to_world(cylinder2);
-
     PhysicsJoint * joint2 = new PhysicsJoint;
-    joint1->parent = cylinder1;
-    joint1->child = cylinder2;
-    joint1->TransformFromParentCoMToJoint = Eigen::Translation3d(0,cylinder1->height/2.0,0);
-    joint1->rotationAxis << 1, 0, 0;
-    joint1->TransformFromJointToChildCoM = Eigen::Translation3d(0,cylinder2->height/2.0,0) * Eigen::AngleAxisd(0,Eigen::Vector3d(0,0,1));
+    joint2->parent = cylinder1;
+    joint2->child = cylinder2;
+    joint2->rotationAxis << 1, 0, 0;
+    joint2->TransformFromJointToChildCoM = Eigen::Translation3d(0,cylinder2->height/2.0,0) * Eigen::AngleAxisd(0,Eigen::Vector3d(0,0,1));
+    joint2->TransformFromJointToChildEnd = Eigen::Translation3d(0,cylinder2->height,0) * Eigen::AngleAxisd(0,Eigen::Vector3d(0,0,1));
+    robot.add_joint(joint2);
 
-    Eigen::Affine3d robotEEPose = robot.get_pose_of_link_end(1);
+    robot.joints[0]->jointAngle = 3.14159/2.0;
+    robot.joints[1]->jointAngle = 3.14159/2.0;
+
+    Eigen::Affine3d actualRobotEEPose = robot.get_transform_from_base_to_link_end(1);
+
+    Eigen::Affine3d expectedRobotEEPose = Eigen::AngleAxisd(joint2->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,cylinder2->height,0)*Eigen::AngleAxisd(joint1->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,cylinder1->height,0);
+
+    //std::cout<<actualRobotEEPose.matrix()<<std::endl;
+    //std::cout<<expectedRobotEEPose.matrix()<<std::endl;
+
+    EXPECT_EQ(expectedRobotEEPose(0,0),actualRobotEEPose(0,0));
+    EXPECT_EQ(expectedRobotEEPose(1,0),actualRobotEEPose(1,0));
+    EXPECT_EQ(expectedRobotEEPose(2,0),actualRobotEEPose(2,0));
+    EXPECT_EQ(expectedRobotEEPose(3,0),actualRobotEEPose(3,0));
+    EXPECT_EQ(expectedRobotEEPose(0,1),actualRobotEEPose(0,1));
+    EXPECT_EQ(expectedRobotEEPose(1,1),actualRobotEEPose(1,1));
+    EXPECT_EQ(expectedRobotEEPose(2,1),actualRobotEEPose(2,1));
+    EXPECT_EQ(expectedRobotEEPose(3,1),actualRobotEEPose(3,1));
+    EXPECT_EQ(expectedRobotEEPose(0,2),actualRobotEEPose(0,2));
+    EXPECT_EQ(expectedRobotEEPose(1,2),actualRobotEEPose(1,2));
+    EXPECT_EQ(expectedRobotEEPose(2,2),actualRobotEEPose(2,2));
+    EXPECT_EQ(expectedRobotEEPose(3,2),actualRobotEEPose(3,2));
+    EXPECT_EQ(expectedRobotEEPose(0,3),actualRobotEEPose(0,3));
+    EXPECT_EQ(expectedRobotEEPose(1,3),actualRobotEEPose(1,3));
+    EXPECT_EQ(expectedRobotEEPose(2,3),actualRobotEEPose(2,3));
+    EXPECT_EQ(expectedRobotEEPose(3,3),actualRobotEEPose(3,3));
+
 
 }
 
