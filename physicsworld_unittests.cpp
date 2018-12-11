@@ -80,23 +80,7 @@ TEST(RoboticsUnitTest,WhenPuttingJointsBetweenLinks_TheyReturnRelativeTransformB
     //std::cout<<actualTransformation.matrix()<<std::endl;
     //std::cout<<ExpectedTransformation.matrix()<<std::endl;
 
-    EXPECT_EQ(ExpectedTransformation(0,0),actualTransformation(0,0));
-    EXPECT_EQ(ExpectedTransformation(1,0),actualTransformation(1,0));
-    EXPECT_EQ(ExpectedTransformation(2,0),actualTransformation(2,0));
-    EXPECT_EQ(ExpectedTransformation(3,0),actualTransformation(3,0));
-    EXPECT_EQ(ExpectedTransformation(0,1),actualTransformation(0,1));
-    EXPECT_EQ(ExpectedTransformation(1,1),actualTransformation(1,1));
-    EXPECT_EQ(ExpectedTransformation(2,1),actualTransformation(2,1));
-    EXPECT_EQ(ExpectedTransformation(3,1),actualTransformation(3,1));
-    EXPECT_EQ(ExpectedTransformation(0,2),actualTransformation(0,2));
-    EXPECT_EQ(ExpectedTransformation(1,2),actualTransformation(1,2));
-    EXPECT_EQ(ExpectedTransformation(2,2),actualTransformation(2,2));
-    EXPECT_EQ(ExpectedTransformation(3,2),actualTransformation(3,2));
-    EXPECT_EQ(ExpectedTransformation(0,3),actualTransformation(0,3));
-    EXPECT_EQ(ExpectedTransformation(1,3),actualTransformation(1,3));
-    EXPECT_EQ(ExpectedTransformation(2,3),actualTransformation(2,3));
-    EXPECT_EQ(ExpectedTransformation(3,3),actualTransformation(3,3));
-
+    EXPECT_EQ(ExpectedTransformation.matrix(),actualTransformation.matrix());
 }
 
 TEST(RoboticsUnitTest,WhenCreatingRobotAndGivingJointAngles_RobotCanDoForwardKinematics)
@@ -119,8 +103,8 @@ TEST(RoboticsUnitTest,WhenCreatingRobotAndGivingJointAngles_RobotCanDoForwardKin
     joint1->parent = robot.base;
     joint1->child = cylinder1;
     joint1->rotationAxis << 1, 0, 0;
-    joint1->TransformFromJointToChildCoM = Eigen::Translation3d(0,cylinder1->height/2.0,0) * Eigen::AngleAxisd(0,Eigen::Vector3d(0,0,1));
-    joint1->TransformFromJointToChildEnd = Eigen::Translation3d(0,cylinder1->height,0) * Eigen::AngleAxisd(0,Eigen::Vector3d(0,0,1));
+    joint1->TransformFromJointToChildCoM = Eigen::Translation3d(0,cylinder1->height/2.0,0);
+    joint1->TransformFromJointToChildEnd = Eigen::Translation3d(0,cylinder1->height,0);
     robot.add_joint(joint1);
 
     PhysicsCylinder *cylinder2 = new PhysicsCylinder;
@@ -131,8 +115,8 @@ TEST(RoboticsUnitTest,WhenCreatingRobotAndGivingJointAngles_RobotCanDoForwardKin
     joint2->parent = cylinder1;
     joint2->child = cylinder2;
     joint2->rotationAxis << 1, 0, 0;
-    joint2->TransformFromJointToChildCoM = Eigen::Translation3d(0,cylinder2->height/2.0,0) * Eigen::AngleAxisd(0,Eigen::Vector3d(0,0,1));
-    joint2->TransformFromJointToChildEnd = Eigen::Translation3d(0,cylinder2->height,0) * Eigen::AngleAxisd(0,Eigen::Vector3d(0,0,1));
+    joint2->TransformFromJointToChildCoM = Eigen::Translation3d(0,cylinder2->height/2.0,0);
+    joint2->TransformFromJointToChildEnd = Eigen::Translation3d(0,cylinder2->height,0);
     robot.add_joint(joint2);
 
     robot.joints[0]->jointAngle = 3.14159/2.0;
@@ -142,26 +126,7 @@ TEST(RoboticsUnitTest,WhenCreatingRobotAndGivingJointAngles_RobotCanDoForwardKin
 
     Eigen::Affine3d expectedRobotEEPose = Eigen::AngleAxisd(joint2->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,cylinder2->height,0)*Eigen::AngleAxisd(joint1->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,cylinder1->height,0);
 
-    //std::cout<<actualRobotEEPose.matrix()<<std::endl;
-    //std::cout<<expectedRobotEEPose.matrix()<<std::endl;
-
-    EXPECT_EQ(expectedRobotEEPose(0,0),actualRobotEEPose(0,0));
-    EXPECT_EQ(expectedRobotEEPose(1,0),actualRobotEEPose(1,0));
-    EXPECT_EQ(expectedRobotEEPose(2,0),actualRobotEEPose(2,0));
-    EXPECT_EQ(expectedRobotEEPose(3,0),actualRobotEEPose(3,0));
-    EXPECT_EQ(expectedRobotEEPose(0,1),actualRobotEEPose(0,1));
-    EXPECT_EQ(expectedRobotEEPose(1,1),actualRobotEEPose(1,1));
-    EXPECT_EQ(expectedRobotEEPose(2,1),actualRobotEEPose(2,1));
-    EXPECT_EQ(expectedRobotEEPose(3,1),actualRobotEEPose(3,1));
-    EXPECT_EQ(expectedRobotEEPose(0,2),actualRobotEEPose(0,2));
-    EXPECT_EQ(expectedRobotEEPose(1,2),actualRobotEEPose(1,2));
-    EXPECT_EQ(expectedRobotEEPose(2,2),actualRobotEEPose(2,2));
-    EXPECT_EQ(expectedRobotEEPose(3,2),actualRobotEEPose(3,2));
-    EXPECT_EQ(expectedRobotEEPose(0,3),actualRobotEEPose(0,3));
-    EXPECT_EQ(expectedRobotEEPose(1,3),actualRobotEEPose(1,3));
-    EXPECT_EQ(expectedRobotEEPose(2,3),actualRobotEEPose(2,3));
-    EXPECT_EQ(expectedRobotEEPose(3,3),actualRobotEEPose(3,3));
-
+    EXPECT_EQ(expectedRobotEEPose.matrix(),actualRobotEEPose.matrix());
 
 }
 
