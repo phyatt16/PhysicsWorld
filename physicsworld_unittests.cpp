@@ -80,7 +80,7 @@ TEST(RoboticsUnitTest,WhenPuttingJointsBetweenLinks_TheyReturnRelativeTransformB
     EXPECT_EQ(ExpectedTransformation.matrix(),actualTransformation.matrix());
 }
 
-TEST(RoboticsUnitTest,WhenCreatingRobotAndGivingJointAngles_RobotCanDoForwardKinematics)
+TEST(RoboticsUnitTest,WhenCreatingRobotAndGivingJointAngles_RobotCanDoForwardKinematicsToEndsOfLinks)
 {
     PhysicsWorld world;
     PhysicsRobot robot;
@@ -91,10 +91,13 @@ TEST(RoboticsUnitTest,WhenCreatingRobotAndGivingJointAngles_RobotCanDoForwardKin
     robot.joints[0]->jointAngle = 3.14159/2.0;
     robot.joints[1]->jointAngle = 3.14159/2.0;
 
+    Eigen::Affine3d actualLink1EndPose = robot.get_transform_from_base_to_link_end(0);
     Eigen::Affine3d actualRobotEEPose = robot.get_transform_from_base_to_link_end(1);
 
+    Eigen::Affine3d expectedLink1EndPose = Eigen::AngleAxisd(robot.joints[0]->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,0,1);
     Eigen::Affine3d expectedRobotEEPose = Eigen::AngleAxisd(robot.joints[1]->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,0,1)*Eigen::AngleAxisd(robot.joints[0]->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,0,1);
 
+    ASSERT_TRUE(actualLink1EndPose.isApprox(expectedLink1EndPose,.001));
     ASSERT_TRUE(actualRobotEEPose.isApprox(expectedRobotEEPose,.001));
 
 }
@@ -115,6 +118,8 @@ TEST(RoboticsUnitTest,WhenCallingUpdateRobotKinematics_LinkObjectsHaveCorrectPos
 
     Eigen::Affine3d actualLink1Pose = robot.joints[0]->child->pose;
     Eigen::Affine3d expectedLink1Pose = Eigen::Translation3d(0,-.5,0)*Eigen::AngleAxisd(3.14159/2.0,Eigen::Vector3d(1,0,0));
+
+    std::cout<<actualLink1Pose.matrix()<<std::endl;
 
     Eigen::Affine3d actualLink2Pose = robot.joints[1]->child->pose;
     Eigen::Affine3d expectedLink2Pose = Eigen::Translation3d(0,-1,-.5)*Eigen::AngleAxisd(3.14159,Eigen::Vector3d(1,0,0));

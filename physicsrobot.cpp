@@ -46,9 +46,8 @@ void PhysicsRobot::update_robot_kinematics()
 {
     for(int i{0}; i<numLinks; i++)
     {
-
         this->joints[i]->update_joint_kinematics();
-        this->joints[i]->child->pose = get_transform_from_base_to_link_CoM(i)*this->base->pose;
+        this->joints[i]->child->pose = this->joints[i]->parent->pose*this->joints[i]->get_transform_from_parent_CoM_to_child_CoM();
     }
 
 }
@@ -76,6 +75,10 @@ PhysicsRobot create_n_link_robot(PhysicsWorld *world,int numLinks)
 
         joint->child = cylinder;
         joint->rotationAxis << 1, 0, 0;
+
+        if(i==0){joint->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,0);}
+        else{joint->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,cylinder->height/2.0);}
+
         joint->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,cylinder->height/2.0);
         joint->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,cylinder->height);
         robot.add_joint(joint);
