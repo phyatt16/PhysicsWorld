@@ -27,8 +27,3 @@ Eigen::Affine3d PhysicsJoint::get_transform_from_parent_end_to_child_end()
     update_joint_kinematics();
     return jointRotationTransform*TransformFromJointToChildEnd;
 }
-
-void PhysicsJoint::update_child_position_relative_to_parent()
-{
-    child->pose = parent->pose * get_transform_from_parent_end_to_child_CoM();
-}

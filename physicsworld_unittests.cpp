@@ -77,58 +77,59 @@ TEST(RoboticsUnitTest,WhenPuttingJointsBetweenLinks_TheyReturnRelativeTransformB
     Eigen::Affine3d ExpectedTransformation = Eigen::AngleAxisd(3.14159/2.0,Eigen::Vector3d(0,0,1))*Eigen::Translation3d(0,1.5,0);
     Eigen::Affine3d actualTransformation = joint1->get_transform_from_parent_end_to_child_end();
 
-    //std::cout<<actualTransformation.matrix()<<std::endl;
-    //std::cout<<ExpectedTransformation.matrix()<<std::endl;
-
     EXPECT_EQ(ExpectedTransformation.matrix(),actualTransformation.matrix());
 }
 
 TEST(RoboticsUnitTest,WhenCreatingRobotAndGivingJointAngles_RobotCanDoForwardKinematics)
 {
     PhysicsWorld world;
-
     PhysicsRobot robot;
 
-    PhysicsBox *box = new PhysicsBox;
-    box->height = 1.0;
-    box->length = 1.0;
-    box->width = 1.0;
-    robot.base = box;
-
-    PhysicsCylinder *cylinder1 = new PhysicsCylinder;
-    cylinder1->height = 1.0;
-    cylinder1->radius = .1;
-    world.add_object_to_world(cylinder1);
-    PhysicsJoint * joint1 = new PhysicsJoint;
-    joint1->parent = robot.base;
-    joint1->child = cylinder1;
-    joint1->rotationAxis << 1, 0, 0;
-    joint1->TransformFromJointToChildCoM = Eigen::Translation3d(0,cylinder1->height/2.0,0);
-    joint1->TransformFromJointToChildEnd = Eigen::Translation3d(0,cylinder1->height,0);
-    robot.add_joint(joint1);
-
-    PhysicsCylinder *cylinder2 = new PhysicsCylinder;
-    cylinder2->height = 1.0;
-    cylinder2->radius = .1;
-    world.add_object_to_world(cylinder2);
-    PhysicsJoint * joint2 = new PhysicsJoint;
-    joint2->parent = cylinder1;
-    joint2->child = cylinder2;
-    joint2->rotationAxis << 1, 0, 0;
-    joint2->TransformFromJointToChildCoM = Eigen::Translation3d(0,cylinder2->height/2.0,0);
-    joint2->TransformFromJointToChildEnd = Eigen::Translation3d(0,cylinder2->height,0);
-    robot.add_joint(joint2);
+    int numLinks{2};
+    robot = create_n_link_robot(&world, numLinks);
 
     robot.joints[0]->jointAngle = 3.14159/2.0;
     robot.joints[1]->jointAngle = 3.14159/2.0;
 
     Eigen::Affine3d actualRobotEEPose = robot.get_transform_from_base_to_link_end(1);
 
-    Eigen::Affine3d expectedRobotEEPose = Eigen::AngleAxisd(joint2->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,cylinder2->height,0)*Eigen::AngleAxisd(joint1->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,cylinder1->height,0);
+    Eigen::Affine3d expectedRobotEEPose = Eigen::AngleAxisd(robot.joints[1]->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,0,1)*Eigen::AngleAxisd(robot.joints[0]->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,0,1);
 
-    EXPECT_EQ(expectedRobotEEPose.matrix(),actualRobotEEPose.matrix());
+    ASSERT_TRUE(actualRobotEEPose.isApprox(expectedRobotEEPose,.001));
 
 }
+
+TEST(RoboticsUnitTest,WhenCallingUpdateRobotKinematics_LinkObjectsHaveCorrectPoses)
+{
+    PhysicsWorld world;
+    PhysicsRobot robot;
+
+    int numLinks{3};
+    robot = create_n_link_robot(&world, numLinks);
+
+    robot.joints[0]->jointAngle = 3.14159/2.0;
+    robot.joints[1]->jointAngle = 3.14159/2.0;
+    robot.joints[2]->jointAngle = 3.14159/2.0;
+
+    robot.update_robot_kinematics();
+
+    Eigen::Affine3d actualLink1Pose = robot.joints[0]->child->pose;
+    Eigen::Affine3d expectedLink1Pose = Eigen::Translation3d(0,-.5,0)*Eigen::AngleAxisd(3.14159/2.0,Eigen::Vector3d(1,0,0));
+
+    Eigen::Affine3d actualLink2Pose = robot.joints[1]->child->pose;
+    Eigen::Affine3d expectedLink2Pose = Eigen::Translation3d(0,-1,-.5)*Eigen::AngleAxisd(3.14159,Eigen::Vector3d(1,0,0));
+
+    Eigen::Affine3d actualLink3Pose = robot.joints[2]->child->pose;
+    Eigen::Affine3d expectedLink3Pose = Eigen::Translation3d(0,-.5,-1)*Eigen::AngleAxisd(3.14159*3.0/2,Eigen::Vector3d(1,0,0));
+
+    ASSERT_TRUE(actualLink1Pose.isApprox(expectedLink1Pose,.001));
+    ASSERT_TRUE(actualLink2Pose.isApprox(expectedLink2Pose,.001));
+    ASSERT_TRUE(actualLink3Pose.isApprox(expectedLink3Pose,.001));
+}
+
+
+
+
 
 
 
