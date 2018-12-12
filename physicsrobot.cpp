@@ -51,8 +51,12 @@ Eigen::Affine3d PhysicsRobot::get_transform_from_base_to_link_CoM(int link_id)
     return this->joints[link_id]->parent->pose*this->joints[link_id]->get_transform_from_parent_CoM_to_child_CoM();
 }
 
-Eigen::VectorXd PhysicsRobot::get_joint_torques_RNE(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd, Eigen::MatrixXd externalWrenches)
+Eigen::VectorXd PhysicsRobot::get_joint_torques_RNE(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd, std::vector<Eigen::Vector3d> externalForces, std::vector<Eigen::Vector3d> externalTorques, Eigen::Vector3d g)
 {
+    calculate_robot_velocities_and_accelerations(q,qd,qdd);
+
+    calculate_robot_forces_and_torques(q,qd,qdd,externalForces,externalTorques,g);
+
     return Eigen::VectorXd::Zero(3,1);
 }
 
@@ -94,8 +98,35 @@ void PhysicsRobot::calculate_robot_velocities_and_accelerations(Eigen::VectorXd 
 
 }
 
-void PhysicsRobot::calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd, Eigen::MatrixXd externalWrenches)
+void PhysicsRobot::calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd, std::vector<Eigen::Vector3d> externalForces, std::vector<Eigen::Vector3d> externalTorques, Eigen::Vector3d g)
 {
+
+    // F_i = F_i+1 + m_i * accel_i - m_i * g_i
+    linkForces[numLinks-1] = joints[numLinks-1]->get_transform_from_parent_CoM_to_child_CoM().rotation()*externalForces[numLinks-1]
+                  + joints[numLinks-1]->child->mass*linkCoMAccels[numLinks-1]
+                  - joints[numLinks-1]->child->mass*(get_transform_from_base_to_link_CoM(numLinks-1)*g);
+
+    // Tau_i = Tau_i+1 + F_i x -rc - F_i+1 x rc + I * alpha_i + omega_i x (I * omega_i)
+    linkTorques[numLinks-1] = joints[numLinks-1]->get_transform_from_parent_CoM_to_child_CoM().rotation()*externalTorques[numLinks-1]
+                   - linkForces[numLinks-1].cross(joints[numLinks-1]->TransformFromJointToChildCoM.translation())
+                   + (joints[numLinks-1]->get_transform_from_parent_CoM_to_child_CoM().rotation()*externalForces[numLinks-1]).cross(-joints[numLinks-1]->TransformFromJointToChildCoM.translation() + joints[numLinks-1]->TransformFromJointToChildEnd.translation())
+                   + joints[numLinks-1]->child->inertiaTensor*linkAlphas[numLinks-1]
+                   + linkOmegas[numLinks-1].cross(joints[numLinks-1]->child->inertiaTensor*linkOmegas[numLinks-1]);
+
+    for(int i{numLinks-1}; i>=0; i--)
+    {
+        // F_i = F_i+1 + m_i * accel_i - m_i * g_i
+        linkForces[i] = joints[i]->get_transform_from_parent_CoM_to_child_CoM().rotation()*linkForces[i+1]
+                      + joints[i]->child->mass*linkCoMAccels[i]
+                      - joints[i]->child->mass*(get_transform_from_base_to_link_CoM(i)*g);
+
+        // Tau_i = Tau_i+1 + F_i x -rc - F_i+1 x rc + I * alpha_i + omega_i x (I * omega_i)
+        linkTorques[i] = joints[i]->get_transform_from_parent_CoM_to_child_CoM().rotation()*linkTorques[i+1]
+                       - linkForces[i].cross(joints[i]->TransformFromJointToChildCoM.translation())
+                       + (joints[i]->get_transform_from_parent_CoM_to_child_CoM().rotation()*linkForces[i+1]).cross(-joints[i]->TransformFromJointToChildCoM.translation() + joints[i]->TransformFromJointToChildEnd.translation())
+                       + joints[i]->child->inertiaTensor*linkAlphas[i]
+                       + linkOmegas[i].cross(joints[i]->child->inertiaTensor*linkOmegas[i]);
+    }
 
 }
 

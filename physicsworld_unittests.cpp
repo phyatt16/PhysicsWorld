@@ -146,9 +146,6 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkAccelerations_LinkAccelerationsAreCorre
     q << 3.14159/4.0,3.14159/4.0,3.14159/4.0;
     qd << 3.14159/6.0,-3.14159/4.0,3.14159/3.0;
     qdd << -3.14159/6.0,3.14159/3.0,3.14159/6.0;
-//    q << 0,0,3.14159;
-//    qd << 1,0,0;
-//    qdd << 0,0,0;
 
     robot.calculate_robot_velocities_and_accelerations(q,qd,qdd);
 
@@ -162,18 +159,12 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkAccelerations_LinkAccelerationsAreCorre
     Eigen::Vector3d expectedLink3Accel;
     expectedLink3Accel << 0,-.4866,-.2041;
 
-    std::cout<<link1Accel<<"\n"<<std::endl;
-    std::cout<<link2Accel<<"\n"<<std::endl;
-    std::cout<<link3Accel<<"\n"<<std::endl;
-
     ASSERT_TRUE(link1Accel.isApprox(expectedLink1Accel,.001));
     ASSERT_TRUE(link2Accel.isApprox(expectedLink2Accel,.001));
     ASSERT_TRUE(link3Accel.isApprox(expectedLink3Accel,.001));
-
-
 }
 
-TEST(RoboticsUnitTest,DISABLED_WhenCalculatingGravityTorquesForPlanarRobot_JointTorquesAreCorrect)
+TEST(RoboticsUnitTest,WhenCalculatingGravityTorquesForPlanarRobot_JointTorquesAreCorrect)
 {
     PhysicsWorld world;
     PhysicsRobot robot;
@@ -189,11 +180,20 @@ TEST(RoboticsUnitTest,DISABLED_WhenCalculatingGravityTorquesForPlanarRobot_Joint
     q << -3.14159/2.0,0,0;
     qd << 0,0,0;
     qdd << 0,0,0;
-    externalWrench << 0,0,0,0,0,0;
+    std::vector<Eigen::Vector3d> externalForces;
+    std::vector<Eigen::Vector3d> externalTorques;
+    for(int i{0}; i<numLinks; i++)
+    {
+        externalForces.push_back(Eigen::Vector3d::Zero());
+        externalTorques.push_back(Eigen::Vector3d::Zero());
+    }
 
-    Eigen::VectorXd jointTorques = robot.get_joint_torques_RNE(q,qd,qdd,externalWrench);
+
+    Eigen::VectorXd jointTorques = robot.get_joint_torques_RNE(q,qd,qdd,externalForces,externalTorques,world.g);
     Eigen::VectorXd expectedJointTorques(numLinks);
     expectedJointTorques << 44.145,19.62,4.905;
+
+    std::cout<<jointTorques<<std::endl;
 
     ASSERT_TRUE(jointTorques.isApprox(expectedJointTorques,.001));
 }
