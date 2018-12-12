@@ -16,6 +16,7 @@ public:
     Eigen::Vector3d velocity;
     double mCoefficientOfRestitution{.8};
     std::string shape;
+
 };
 
 #endif // PHYSICSOBJECT_H

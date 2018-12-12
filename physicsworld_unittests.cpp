@@ -18,9 +18,10 @@ TEST(PhysicsWorldUnitTest,WhenAddingDifferentObjects_TheyRetainTheirUniqueProper
 
     PhysicsSphere *sphere = new PhysicsSphere;
     sphere->radius = 2;
-    PhysicsCylinder *cylinder = new PhysicsCylinder;
-    cylinder->height = 1.5;
-    cylinder->radius = .1;
+    double height = 1.5;
+    double radius = .1;
+    double mass = 1;
+    PhysicsCylinder *cylinder = new PhysicsCylinder(height, radius, mass);
     PhysicsBox *box = new PhysicsBox;
     box->length = 3;
     box->height = 4;
@@ -54,15 +55,15 @@ TEST(PhysicsWorldUnitTest,WhenAddingDifferentObjects_TheyRetainTheirUniqueProper
 TEST(RoboticsUnitTest,WhenPuttingJointsBetweenLinks_TheyReturnRelativeTransformBetweenLinks)
 {
     PhysicsWorld world;
-
-    PhysicsCylinder *cylinder1 = new PhysicsCylinder;
+    double height = 1.5;
+    double radius = .1;
+    double mass = 1;
+    PhysicsCylinder *cylinder1 = new PhysicsCylinder(height, radius, mass);
     cylinder1->height = 1.5;
     cylinder1->radius = .1;
     world.add_object_to_world(cylinder1);
 
-    PhysicsCylinder *cylinder2 = new PhysicsCylinder;
-    cylinder2->height = 1.5;
-    cylinder2->radius = .1;
+    PhysicsCylinder *cylinder2 = new PhysicsCylinder(height, radius, mass);
     world.add_object_to_world(cylinder2);
 
     PhysicsJoint * joint1 = new PhysicsJoint;
@@ -170,20 +171,16 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
     PhysicsRobot robot;
 
     int numLinks{3};
-    double linkLengths = .4;
+    double linkLengths = 1;
     robot = create_n_link_robot(&world, numLinks, linkLengths);
 
     Eigen::VectorXd q(numLinks);
     Eigen::VectorXd qd(numLinks);
     Eigen::VectorXd qdd(numLinks);
 
-//    q << 3.14159/4.0,3.14159/4.0,3.14159/4.0;
-//    qd << 3.14159/6.0,-3.14159/4.0,3.14159/3.0;
-//    qdd << -3.14159/6.0,3.14159/3.0,3.14159/6.0;
-
-    q << 3.14159/2.0,0,0;
-    qd << 0,0,0;
-    qdd << 0,0,0;
+    q << 3.14159/4.0,3.14159/4.0,3.14159/4.0;
+    qd << 3.14159/6.0,-3.14159/4.0,3.14159/3.0;
+    qdd << -3.14159/6.0,3.14159/3.0,3.14159/6.0;
 
     robot.calculate_robot_velocities_and_accelerations(q,qd,qdd);
 
@@ -201,26 +198,18 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
     Eigen::Vector3d link2Force = robot.linkForces[1];
     Eigen::Vector3d link3Force = robot.linkForces[2];
     Eigen::Vector3d expectedLink1Force;
-    expectedLink1Force << 0,-20.3562,20.0753;
+    expectedLink1Force << 0,21.9449,18.9731;
     Eigen::Vector3d expectedLink2Force;
-    expectedLink2Force << 0,-.2339,18.8923;
+    expectedLink2Force << 0,19.0352,-1.8193;
     Eigen::Vector3d expectedLink3Force;
-    expectedLink3Force << 0,6.4501,0;
-
-    std::cout<<link1Force<<std::endl;
-    std::cout<<link2Force<<std::endl;
-    std::cout<<link3Force<<"\n\n"<<std::endl;
-
-    std::cout<<robot.linkTorques[0]<<std::endl;
-    std::cout<<robot.linkTorques[1]<<std::endl;
-    std::cout<<robot.linkTorques[2]<<std::endl;
+    expectedLink3Force << 0,5.7203,-7.4470;
 
     ASSERT_TRUE(link1Force.isApprox(expectedLink1Force,.001));
     ASSERT_TRUE(link2Force.isApprox(expectedLink2Force,.001));
     ASSERT_TRUE(link3Force.isApprox(expectedLink3Force,.001));
 }
 
-TEST(RoboticsUnitTest,DISABLED_WhenCalculatingGravityTorquesForPlanarRobot_JointTorquesAreCorrect)
+TEST(RoboticsUnitTest,WhenCalculatingGravityTorquesForPlanarRobot_JointTorquesAreCorrect)
 {
     PhysicsWorld world;
     PhysicsRobot robot;
@@ -231,11 +220,10 @@ TEST(RoboticsUnitTest,DISABLED_WhenCalculatingGravityTorquesForPlanarRobot_Joint
     Eigen::VectorXd q(numLinks);
     Eigen::VectorXd qd(numLinks);
     Eigen::VectorXd qdd(numLinks);
-    Eigen::MatrixXd externalWrench(6,1);
-
-    q << -3.14159/2.0,0,0;
+    q << 3.14159/2.0,0,0;
     qd << 0,0,0;
     qdd << 0,0,0;
+
     std::vector<Eigen::Vector3d> externalForces;
     std::vector<Eigen::Vector3d> externalTorques;
     for(int i{0}; i<numLinks; i++)
@@ -244,12 +232,43 @@ TEST(RoboticsUnitTest,DISABLED_WhenCalculatingGravityTorquesForPlanarRobot_Joint
         externalTorques.push_back(Eigen::Vector3d::Zero());
     }
 
+    Eigen::VectorXd jointTorques = robot.get_joint_torques_RNE(q,qd,qdd,externalForces,externalTorques,world.g);
+    Eigen::VectorXd expectedJointTorques(numLinks);
+    expectedJointTorques << -44.145,-19.62,-4.905;
+
+    ASSERT_TRUE(jointTorques.isApprox(expectedJointTorques,.001));
+}
+
+TEST(RoboticsUnitTest,WhenCalculatingJointTorquesWithExternalForce_JointTorquesAreCorrect)
+{
+    PhysicsWorld world;
+    PhysicsRobot robot;
+
+    int numLinks{3};
+    robot = create_n_link_robot(&world, numLinks);
+
+    Eigen::VectorXd q(numLinks);
+    Eigen::VectorXd qd(numLinks);
+    Eigen::VectorXd qdd(numLinks);
+    q << 3.14159/2.0,0,0;
+    qd << 0,0,0;
+    qdd << 0,0,0;
+
+    std::vector<Eigen::Vector3d> externalForces;
+    std::vector<Eigen::Vector3d> externalTorques;
+    for(int i{0}; i<numLinks; i++)
+    {
+        externalForces.push_back(Eigen::Vector3d::Zero());
+        externalTorques.push_back(Eigen::Vector3d::Zero());
+    }
+
+    externalForces[0] << 0,0,0;
+    externalForces[1] << 0,0,0;
+    externalForces[2](2)=-1;
 
     Eigen::VectorXd jointTorques = robot.get_joint_torques_RNE(q,qd,qdd,externalForces,externalTorques,world.g);
     Eigen::VectorXd expectedJointTorques(numLinks);
-    expectedJointTorques << 44.145,19.62,4.905;
-
-    //std::cout<<jointTorques<<std::endl;
+    expectedJointTorques << -47.145,-21.62,-5.905;
 
     ASSERT_TRUE(jointTorques.isApprox(expectedJointTorques,.001));
 }

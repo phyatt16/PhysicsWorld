@@ -7,10 +7,11 @@
 class PhysicsCylinder : public PhysicsObject
 {
 public:
-    PhysicsCylinder();
+    PhysicsCylinder(double height, double radius, double mass);
     ~PhysicsCylinder(){};
     double height;
     double radius;
+
 };
 
 #endif // PHYSICSCYLINDER_H
