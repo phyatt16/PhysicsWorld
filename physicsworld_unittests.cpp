@@ -164,7 +164,63 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkAccelerations_LinkAccelerationsAreCorre
     ASSERT_TRUE(link3Accel.isApprox(expectedLink3Accel,.001));
 }
 
-TEST(RoboticsUnitTest,WhenCalculatingGravityTorquesForPlanarRobot_JointTorquesAreCorrect)
+TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
+{
+    PhysicsWorld world;
+    PhysicsRobot robot;
+
+    int numLinks{3};
+    double linkLengths = .4;
+    robot = create_n_link_robot(&world, numLinks, linkLengths);
+
+    Eigen::VectorXd q(numLinks);
+    Eigen::VectorXd qd(numLinks);
+    Eigen::VectorXd qdd(numLinks);
+
+//    q << 3.14159/4.0,3.14159/4.0,3.14159/4.0;
+//    qd << 3.14159/6.0,-3.14159/4.0,3.14159/3.0;
+//    qdd << -3.14159/6.0,3.14159/3.0,3.14159/6.0;
+
+    q << 3.14159,0,0;
+    qd << 0,0,0;
+    qdd << 0,0,0;
+
+    robot.calculate_robot_velocities_and_accelerations(q,qd,qdd);
+
+    std::vector<Eigen::Vector3d> externalForces;
+    std::vector<Eigen::Vector3d> externalTorques;
+    for(int i{0}; i<numLinks; i++)
+    {
+        externalForces.push_back(Eigen::Vector3d::Zero());
+        externalTorques.push_back(Eigen::Vector3d::Zero());
+    }
+
+    robot.calculate_robot_forces_and_torques(q,qd,qdd,externalForces,externalTorques,world.g);
+
+    Eigen::Vector3d link1Force = robot.linkForces[0];
+    Eigen::Vector3d link2Force = robot.linkForces[1];
+    Eigen::Vector3d link3Force = robot.linkForces[2];
+    Eigen::Vector3d expectedLink1Force;
+    expectedLink1Force << 0,-20.3562,20.0753;
+    Eigen::Vector3d expectedLink2Force;
+    expectedLink2Force << 0,-.2339,18.8923;
+    Eigen::Vector3d expectedLink3Force;
+    expectedLink3Force << 0,6.4501,0;
+
+    std::cout<<link1Force<<std::endl;
+    std::cout<<link2Force<<std::endl;
+    std::cout<<link3Force<<"\n\n"<<std::endl;
+
+    std::cout<<robot.linkTorques[0]<<std::endl;
+    std::cout<<robot.linkTorques[1]<<std::endl;
+    std::cout<<robot.linkTorques[2]<<std::endl;
+
+    ASSERT_TRUE(link1Force.isApprox(expectedLink1Force,.001));
+    ASSERT_TRUE(link2Force.isApprox(expectedLink2Force,.001));
+    ASSERT_TRUE(link3Force.isApprox(expectedLink3Force,.001));
+}
+
+TEST(RoboticsUnitTest,DISABLED_WhenCalculatingGravityTorquesForPlanarRobot_JointTorquesAreCorrect)
 {
     PhysicsWorld world;
     PhysicsRobot robot;
@@ -193,7 +249,7 @@ TEST(RoboticsUnitTest,WhenCalculatingGravityTorquesForPlanarRobot_JointTorquesAr
     Eigen::VectorXd expectedJointTorques(numLinks);
     expectedJointTorques << 44.145,19.62,4.905;
 
-    std::cout<<jointTorques<<std::endl;
+    //std::cout<<jointTorques<<std::endl;
 
     ASSERT_TRUE(jointTorques.isApprox(expectedJointTorques,.001));
 }
