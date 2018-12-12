@@ -181,7 +181,7 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
 //    qd << 3.14159/6.0,-3.14159/4.0,3.14159/3.0;
 //    qdd << -3.14159/6.0,3.14159/3.0,3.14159/6.0;
 
-    q << 3.14159,0,0;
+    q << 3.14159/2.0,0,0;
     qd << 0,0,0;
     qdd << 0,0,0;
 

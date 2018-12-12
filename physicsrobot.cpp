@@ -104,10 +104,13 @@ void PhysicsRobot::calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::
     // F_i = F_i+1 + m_i * accel_i - m_i * g_i
     linkForces[numLinks-1] = joints[numLinks-1]->get_transform_from_parent_CoM_to_child_CoM().rotation()*externalForces[numLinks-1]
                   + joints[numLinks-1]->child->mass*linkCoMAccels[numLinks-1]
-                  - joints[numLinks-1]->child->mass*(get_transform_from_base_to_link_CoM(numLinks-1)*g);
+                  - joints[numLinks-1]->child->mass*(get_transform_from_base_to_link_CoM(numLinks-1).rotation()*g);
 
-    //std::cout<<- joints[numLinks-1]->child->mass*(get_transform_from_base_to_link_CoM(numLinks-1)*g)<<std::endl;
-    //std::cout<<linkForces[numLinks-1]<<std::endl;
+//    std::cout<<joints[numLinks-1]->child->mass*(get_transform_from_base_to_link_CoM(numLinks-1).rotation()*g)<<std::endl;
+//    std::cout<<get_transform_from_base_to_link_CoM(numLinks-1).matrix()<<std::endl;
+//    std::cout<<g<<std::endl;
+//    std::cout<<get_transform_from_base_to_link_CoM(numLinks-1)*g<<std::endl;
+//    std::cout<<joints[numLinks-1]->child->mass<<std::endl;
 
     // Tau_i = Tau_i+1 + F_i x -rc - F_i+1 x rc + I * alpha_i + omega_i x (I * omega_i)
     linkTorques[numLinks-1] = joints[numLinks-1]->get_transform_from_parent_CoM_to_child_CoM().rotation()*externalTorques[numLinks-1]
@@ -120,12 +123,12 @@ void PhysicsRobot::calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::
     //std::cout<<linkTorques[numLinks-1]<<std::endl;
 
 
-    for(int i{numLinks-1}; i>=0; i--)
+    for(int i{numLinks-1}; i>=0; i=i-1)
     {
         // F_i = F_i+1 + m_i * accel_i - m_i * g_i
         linkForces[i] = joints[i]->get_transform_from_parent_CoM_to_child_CoM().rotation()*linkForces[i+1]
                       + joints[i]->child->mass*linkCoMAccels[i]
-                      - joints[i]->child->mass*(get_transform_from_base_to_link_CoM(i)*g);
+                      - joints[i]->child->mass*(get_transform_from_base_to_link_CoM(i).rotation()*g);
 
         // Tau_i = Tau_i+1 + F_i x -rc - F_i+1 x rc + I * alpha_i + omega_i x (I * omega_i)
         linkTorques[i] = joints[i]->get_transform_from_parent_CoM_to_child_CoM().rotation()*linkTorques[i+1]
