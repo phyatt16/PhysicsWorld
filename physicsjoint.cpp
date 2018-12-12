@@ -28,6 +28,12 @@ Eigen::Affine3d PhysicsJoint::get_transform_from_parent_CoM_to_child_CoM()
     return TransformFromParentCoMToJoint*jointRotationTransform*TransformFromJointToChildCoM;
 }
 
+Eigen::Affine3d PhysicsJoint::get_transform_from_parent_CoM_to_child_end()
+{
+    update_joint_kinematics();
+    return TransformFromParentCoMToJoint*jointRotationTransform*TransformFromJointToChildEnd;
+}
+
 
 Eigen::Affine3d PhysicsJoint::get_transform_from_parent_end_to_child_end()
 {

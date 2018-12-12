@@ -15,7 +15,10 @@ public:
     void update_child_position_relative_to_parent();
     Eigen::Affine3d get_transform_from_parent_end_to_child_CoM();
     Eigen::Affine3d get_transform_from_parent_CoM_to_child_CoM();
+    Eigen::Affine3d get_transform_from_parent_CoM_to_child_end();
     Eigen::Affine3d get_transform_from_parent_end_to_child_end();
+
+
 
     PhysicsObject * parent;
     PhysicsObject * child;
