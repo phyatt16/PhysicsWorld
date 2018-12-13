@@ -267,3 +267,131 @@ PhysicsRobot create_n_link_robot(PhysicsWorld *world,int numLinks, double linkLe
 
     return robot;
 }
+
+PhysicsRobot create_baxter_robot(PhysicsWorld *world)
+{
+    PhysicsRobot robot;
+
+    double height = .10;
+    double radius = .075;
+    double mass = 1;
+    PhysicsCylinder *link0 = new PhysicsCylinder(height,radius,mass);
+    robot.base = link0;
+    world->add_object_to_world(link0);
+
+    // Joint 1
+    height = .27035;
+    radius = .08;
+    mass = 1;
+    PhysicsCylinder *link1 = new PhysicsCylinder(height,radius,mass);
+    world->add_object_to_world(link1);
+    PhysicsJoint * joint1 = new PhysicsJoint;
+    joint1->parent = robot.base;
+    joint1->child = link1;
+    joint1->rotationAxis << 0, 0, 1;
+    joint1->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,.05);
+    joint1->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link1->height/2.0);
+    joint1->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,link1->height);
+    robot.add_joint(joint1);
+
+    // Joint 2
+    height = .001;
+    radius = .08;
+    mass = 1;
+    PhysicsCylinder *link2 = new PhysicsCylinder(height,radius,mass);
+    world->add_object_to_world(link2);
+    PhysicsJoint * joint2 = new PhysicsJoint;
+    joint2->parent = joint1->child;
+    joint2->child = link2;
+    joint2->rotationAxis << 0, 1, 0;
+    joint2->TransformFromParentCoMToJoint = joint1->TransformFromJointToChildCoM.inverse()*joint1->TransformFromJointToChildEnd*Eigen::AngleAxisd(3.14159/2.0,Eigen::Vector3d(0,1,0));
+    joint2->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link2->height/2.0);
+    joint2->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,link2->height);
+    robot.add_joint(joint2);
+
+
+
+    // Joint 3
+    height = .36435;
+    radius = .08;
+    mass = 1;
+    PhysicsCylinder *link3 = new PhysicsCylinder(height,radius,mass);
+    world->add_object_to_world(link3);
+    PhysicsJoint * joint3 = new PhysicsJoint;
+    joint3->parent = joint2->child;
+    joint3->child = link3;
+    joint3->rotationAxis << 0, 0, 1;
+    joint3->TransformFromParentCoMToJoint = joint2->TransformFromJointToChildCoM.inverse()*joint2->TransformFromJointToChildEnd;
+    joint3->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link3->height/2.0);
+    joint3->TransformFromJointToChildEnd = Eigen::Translation3d(0.069,0,link3->height);
+    robot.add_joint(joint3);
+
+
+    // Joint 4
+    height = .001;
+    radius = .06;
+    mass = 1;
+    PhysicsCylinder *link4 = new PhysicsCylinder(height,radius,mass);
+    world->add_object_to_world(link4);
+    PhysicsJoint * joint4 = new PhysicsJoint;
+    joint4->parent = joint3->child;
+    joint4->child = link4;
+    joint4->rotationAxis << 0, 1, 0;
+    joint4->TransformFromParentCoMToJoint = joint3->TransformFromJointToChildCoM.inverse()*joint3->TransformFromJointToChildEnd;
+    joint4->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link4->height/2.0);
+    joint4->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,link4->height);
+    robot.add_joint(joint4);
+
+
+    // Joint 5
+    height = .37429;
+    radius = .06;
+    mass = 1;
+    PhysicsCylinder *link5 = new PhysicsCylinder(height,radius,mass);
+    world->add_object_to_world(link5);
+    PhysicsJoint * joint5 = new PhysicsJoint;
+    joint5->parent = joint4->child;
+    joint5->child = link5;
+    joint5->rotationAxis << 0, 0, 1;
+    joint5->TransformFromParentCoMToJoint = joint4->TransformFromJointToChildCoM.inverse()*joint4->TransformFromJointToChildEnd;
+    joint5->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link5->height/2.0);
+    joint5->TransformFromJointToChildEnd = Eigen::Translation3d(.01,0,link5->height);
+    robot.add_joint(joint5);
+
+    // Joint 6
+    height = .001;
+    radius = .04;
+    mass = 1;
+    PhysicsCylinder *link6 = new PhysicsCylinder(height,radius,mass);
+    world->add_object_to_world(link6);
+    PhysicsJoint * joint6 = new PhysicsJoint;
+    joint6->parent = joint5->child;
+    joint6->child = link6;
+    joint6->rotationAxis << 0, 1, 0;
+    joint6->TransformFromParentCoMToJoint = joint5->TransformFromJointToChildCoM.inverse()*joint5->TransformFromJointToChildEnd;
+    joint6->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link6->height/2.0);
+    joint6->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,link6->height);
+    robot.add_joint(joint6);
+
+
+    // Joint 7
+    height = .229525;
+    radius = .04;
+    mass = 1;
+    PhysicsCylinder *link7 = new PhysicsCylinder(height,radius,mass);
+    world->add_object_to_world(link7);
+    PhysicsJoint * joint7 = new PhysicsJoint;
+    joint7->parent = joint6->child;
+    joint7->child = link7;
+    joint7->rotationAxis << 0, 0, 1;
+    joint7->TransformFromParentCoMToJoint = joint6->TransformFromJointToChildCoM.inverse()*joint6->TransformFromJointToChildEnd;
+    joint7->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link7->height/2.0);
+    joint7->TransformFromJointToChildEnd = Eigen::Translation3d(.01,0,link7->height);
+    robot.add_joint(joint7);
+
+
+
+
+
+    return robot;
+}

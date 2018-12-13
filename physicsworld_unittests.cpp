@@ -282,16 +282,16 @@ TEST(RoboticsUnitTest,WhenCalculatingMassMatrix_MassMatrixIsCorrect)
     robot = create_n_link_robot(&world, numLinks);
 
     Eigen::VectorXd q(numLinks);
-    //q << 0,0,0;
+    q << 3.14159/4.0,3.14159/4.0,3.14159/4.0;
 
     Eigen::MatrixXd actualMassMatrix = robot.get_mass_matrix(q);
 
     Eigen::MatrixXd expectedMassMatrix(numLinks,numLinks);
-    //expectedMassMatrix.row(0) << 0, 0, 0;
-    //expectedMassMatrix.row(1) << 0, 0, 0;
-    //expectedMassMatrix.row(2) << 0, 0, 0;
+    expectedMassMatrix.row(0) << 6.8359, 3.4394, .6894;
+    expectedMassMatrix.row(1) << 3.4394, 2.3788, .6894;
+    expectedMassMatrix.row(2) << 0.6894, .6894, .3358;
 
-    std::cout<<actualMassMatrix.matrix()<<std::endl;
+    //std::cout<<actualMassMatrix.matrix()<<std::endl;
 
     ASSERT_TRUE(expectedMassMatrix.isApprox(actualMassMatrix,.001));
 }
@@ -320,7 +320,31 @@ TEST(RoboticsUnitTest,WhenCalculatingAccelerations_AccelerationsAreCorrect)
 
     ASSERT_TRUE(expectedAcceleration.isApprox(actualAcceleration,.001));
 }
+/*
+TEST(RoboticsUnitTest,WhenCalculatingAccelerationsForBaxterRobotInSeveralStates_AccelerationsAreCorrect)
+{
+    PhysicsWorld world;
+    int numLinks = 7;
 
+    PhysicsRobot robot = create_baxter_robot(&world);
+
+    Eigen::VectorXd q(numLinks);
+    Eigen::VectorXd qd(numLinks);
+    Eigen::VectorXd tau(numLinks);
+//    q << 0,0,0;
+//    qd << 0,0,0;
+//    tau << 0,0,0;
+
+    Eigen::VectorXd actualAcceleration = robot.get_accel(q,qd,tau,world.g);
+
+    Eigen::VectorXd expectedAcceleration(numLinks);
+//    expectedAcceleration << 0, 0, 0;
+
+    std::cout<<actualAcceleration<<std::endl;
+
+    ASSERT_TRUE(expectedAcceleration.isApprox(actualAcceleration,.001));
+}
+*/
 
 
 
