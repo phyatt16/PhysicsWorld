@@ -130,7 +130,7 @@ TEST(RoboticsUnitTest,WhenCallingUpdateRobotKinematics_LinkObjectsHaveCorrectPos
     ASSERT_TRUE(actualLink2Pose.isApprox(expectedLink2Pose,.001));
     ASSERT_TRUE(actualLink3Pose.isApprox(expectedLink3Pose,.001));
 }
-
+/*
 TEST(RoboticsUnitTest,WhenCalculatingLinkAccelerations_LinkAccelerationsAreCorrect)
 {
     PhysicsWorld world;
@@ -208,7 +208,7 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
     ASSERT_TRUE(link2Force.isApprox(expectedLink2Force,.001));
     ASSERT_TRUE(link3Force.isApprox(expectedLink3Force,.001));
 }
-
+*/
 TEST(RoboticsUnitTest,WhenCalculatingGravityTorquesForPlanarRobot_JointTorquesAreCorrect)
 {
     PhysicsWorld world;

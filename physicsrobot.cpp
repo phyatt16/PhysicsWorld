@@ -1,6 +1,7 @@
 #include "physicsrobot.h"
 #include "physicsworld.h"
 #include "eigen3/Eigen/LU"
+#include <thread>
 
 PhysicsRobot::PhysicsRobot()
 {
@@ -14,12 +15,6 @@ void PhysicsRobot::add_joint(PhysicsJoint * joint)
     q.resize(numLinks,1);
     qd.resize(numLinks,1);
     qdd.resize(numLinks,1);
-    linkCoMAccels.resize(numLinks);
-    linkEndAccels.resize(numLinks);
-    linkOmegas.resize(numLinks);
-    linkAlphas.resize(numLinks);
-    linkForces.resize(numLinks);
-    linkTorques.resize(numLinks);
 }
 
 void PhysicsRobot::update_robot_kinematics()
@@ -44,6 +39,11 @@ Eigen::VectorXd PhysicsRobot::get_accel(Eigen::VectorXd q, Eigen::VectorXd qd, E
     return get_mass_matrix(q).inverse() * (tau - get_coriolis_torques(q,qd) - get_gravity_torques(q,g));
 }
 
+void PhysicsRobot::calculate_column_of_mass_matrix(Eigen::VectorXd *q, Eigen::VectorXd *qd, Eigen::VectorXd qdd, std::vector<Eigen::Vector3d> *externalForces, std::vector<Eigen::Vector3d> *externalTorques, Eigen::Vector3d *g, Eigen::MatrixXd * M, int i)
+{
+    M->col(i) = get_joint_torques_RNE(*q,*qd,qdd,*externalForces,*externalTorques,*g);
+}
+
 Eigen::MatrixXd PhysicsRobot::get_mass_matrix(Eigen::VectorXd q)
 {
     Eigen::VectorXd qd = Eigen::VectorXd::Zero(numLinks);
@@ -59,12 +59,21 @@ Eigen::MatrixXd PhysicsRobot::get_mass_matrix(Eigen::VectorXd q)
     }
 
     Eigen::MatrixXd M(numLinks,numLinks);
+    std::vector<std::thread> threads;
     for(int i{0}; i<numLinks; i++)
     {
         qdd(i) = 1;
+        //threads.push_back(std::thread(&PhysicsRobot::calculate_column_of_mass_matrix,this,&q,&qd,qdd,&externalForces,&externalTorques,&g,&M,i));
         M.col(i) = get_joint_torques_RNE(q,qd,qdd,externalForces,externalTorques,g);
         qdd(i) = 0;
     }
+
+//    for(int i{0}; i<numLinks; i++)
+//    {
+//        threads[i].join();
+//    }
+
+
     return M;
 }
 
@@ -121,9 +130,22 @@ Eigen::Affine3d PhysicsRobot::get_transform_from_base_to_link_CoM(int link_id)
 
 Eigen::VectorXd PhysicsRobot::get_joint_torques_RNE(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd, std::vector<Eigen::Vector3d> externalForces, std::vector<Eigen::Vector3d> externalTorques, Eigen::Vector3d g)
 {
-    calculate_robot_velocities_and_accelerations(q,qd,qdd);
+    std::vector<Eigen::Vector3d> linkCoMAccels;
+    std::vector<Eigen::Vector3d> linkEndAccels;
+    std::vector<Eigen::Vector3d> linkOmegas;
+    std::vector<Eigen::Vector3d> linkAlphas;
+    std::vector<Eigen::Vector3d> linkForces;
+    std::vector<Eigen::Vector3d> linkTorques;
+    linkCoMAccels.resize(numLinks);
+    linkEndAccels.resize(numLinks);
+    linkOmegas.resize(numLinks);
+    linkAlphas.resize(numLinks);
+    linkForces.resize(numLinks);
+    linkTorques.resize(numLinks);
 
-    calculate_robot_forces_and_torques(q,qd,qdd,externalForces,externalTorques,g);
+    calculate_robot_velocities_and_accelerations(q,qd,qdd,linkCoMAccels,linkEndAccels,linkOmegas,linkAlphas);
+
+    calculate_robot_forces_and_torques(q,qd,qdd,externalForces,externalTorques,g,linkCoMAccels,linkOmegas,linkAlphas,linkForces,linkTorques);
 
     Eigen::VectorXd jointTorques(numLinks);
     for(int i{0}; i<numLinks; i++)
@@ -134,7 +156,7 @@ Eigen::VectorXd PhysicsRobot::get_joint_torques_RNE(Eigen::VectorXd q, Eigen::Ve
     return jointTorques;
 }
 
-void PhysicsRobot::calculate_robot_velocities_and_accelerations(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd)
+void PhysicsRobot::calculate_robot_velocities_and_accelerations(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd, std::vector<Eigen::Vector3d> &linkCoMAccels, std::vector<Eigen::Vector3d> &linkEndAccels, std::vector<Eigen::Vector3d> &linkOmegas, std::vector<Eigen::Vector3d> &linkAlphas)
 {
     set_joint_angles(q);
 
@@ -172,7 +194,7 @@ void PhysicsRobot::calculate_robot_velocities_and_accelerations(Eigen::VectorXd 
 
 }
 
-void PhysicsRobot::calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd, std::vector<Eigen::Vector3d> externalForces, std::vector<Eigen::Vector3d> externalTorques, Eigen::Vector3d g)
+void PhysicsRobot::calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd, std::vector<Eigen::Vector3d> externalForces, std::vector<Eigen::Vector3d> externalTorques, Eigen::Vector3d g, std::vector<Eigen::Vector3d> &linkCoMAccels, std::vector<Eigen::Vector3d> &linkOmegas, std::vector<Eigen::Vector3d> &linkAlphas, std::vector<Eigen::Vector3d> &linkForces, std::vector<Eigen::Vector3d> &linkTorques)
 {
 
     // F_i = F_i+1 + m_i * accel_i - m_i * g_i
