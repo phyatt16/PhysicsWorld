@@ -309,8 +309,6 @@ PhysicsRobot create_baxter_robot(PhysicsWorld *world)
     joint2->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,link2->height);
     robot.add_joint(joint2);
 
-
-
     // Joint 3
     height = .36435;
     radius = .08;
@@ -388,10 +386,6 @@ PhysicsRobot create_baxter_robot(PhysicsWorld *world)
     joint7->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link7->height/2.0);
     joint7->TransformFromJointToChildEnd = Eigen::Translation3d(.01,0,link7->height);
     robot.add_joint(joint7);
-
-
-
-
 
     return robot;
 }

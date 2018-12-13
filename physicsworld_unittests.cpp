@@ -130,13 +130,26 @@ TEST(RoboticsUnitTest,WhenCallingUpdateRobotKinematics_LinkObjectsHaveCorrectPos
     ASSERT_TRUE(actualLink2Pose.isApprox(expectedLink2Pose,.001));
     ASSERT_TRUE(actualLink3Pose.isApprox(expectedLink3Pose,.001));
 }
-/*
+
 TEST(RoboticsUnitTest,WhenCalculatingLinkAccelerations_LinkAccelerationsAreCorrect)
 {
     PhysicsWorld world;
     PhysicsRobot robot;
-
     int numLinks{3};
+
+    std::vector<Eigen::Vector3d> linkCoMAccels;
+    std::vector<Eigen::Vector3d> linkEndAccels;
+    std::vector<Eigen::Vector3d> linkOmegas;
+    std::vector<Eigen::Vector3d> linkAlphas;
+    std::vector<Eigen::Vector3d> linkForces;
+    std::vector<Eigen::Vector3d> linkTorques;
+    linkCoMAccels.resize(numLinks);
+    linkEndAccels.resize(numLinks);
+    linkOmegas.resize(numLinks);
+    linkAlphas.resize(numLinks);
+    linkForces.resize(numLinks);
+    linkTorques.resize(numLinks);
+
     double linkLengths = .4;
     robot = create_n_link_robot(&world, numLinks, linkLengths);
 
@@ -148,11 +161,11 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkAccelerations_LinkAccelerationsAreCorre
     qd << 3.14159/6.0,-3.14159/4.0,3.14159/3.0;
     qdd << -3.14159/6.0,3.14159/3.0,3.14159/6.0;
 
-    robot.calculate_robot_velocities_and_accelerations(q,qd,qdd);
+    robot.calculate_robot_velocities_and_accelerations(q,qd,qdd,linkCoMAccels,linkEndAccels,linkOmegas,linkAlphas);
 
-    Eigen::Vector3d link1Accel = robot.linkCoMAccels[0];
-    Eigen::Vector3d link2Accel = robot.linkCoMAccels[1];
-    Eigen::Vector3d link3Accel = robot.linkCoMAccels[2];
+    Eigen::Vector3d link1Accel = linkCoMAccels[0];
+    Eigen::Vector3d link2Accel = linkCoMAccels[1];
+    Eigen::Vector3d link3Accel = linkCoMAccels[2];
     Eigen::Vector3d expectedLink1Accel;
     expectedLink1Accel << 0,.1047,-.0548;
     Eigen::Vector3d expectedLink2Accel;
@@ -173,6 +186,18 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
     int numLinks{3};
     double linkLengths = 1;
     robot = create_n_link_robot(&world, numLinks, linkLengths);
+    std::vector<Eigen::Vector3d> linkCoMAccels;
+    std::vector<Eigen::Vector3d> linkEndAccels;
+    std::vector<Eigen::Vector3d> linkOmegas;
+    std::vector<Eigen::Vector3d> linkAlphas;
+    std::vector<Eigen::Vector3d> linkForces;
+    std::vector<Eigen::Vector3d> linkTorques;
+    linkCoMAccels.resize(numLinks);
+    linkEndAccels.resize(numLinks);
+    linkOmegas.resize(numLinks);
+    linkAlphas.resize(numLinks);
+    linkForces.resize(numLinks);
+    linkTorques.resize(numLinks);
 
     Eigen::VectorXd q(numLinks);
     Eigen::VectorXd qd(numLinks);
@@ -182,7 +207,7 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
     qd << 3.14159/6.0,-3.14159/4.0,3.14159/3.0;
     qdd << -3.14159/6.0,3.14159/3.0,3.14159/6.0;
 
-    robot.calculate_robot_velocities_and_accelerations(q,qd,qdd);
+    robot.calculate_robot_velocities_and_accelerations(q,qd,qdd,linkCoMAccels,linkEndAccels,linkOmegas,linkAlphas);
 
     std::vector<Eigen::Vector3d> externalForces;
     std::vector<Eigen::Vector3d> externalTorques;
@@ -192,11 +217,11 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
         externalTorques.push_back(Eigen::Vector3d::Zero());
     }
 
-    robot.calculate_robot_forces_and_torques(q,qd,qdd,externalForces,externalTorques,world.g);
+    robot.calculate_robot_forces_and_torques(q,qd,qdd,externalForces,externalTorques,world.g,linkCoMAccels,linkOmegas,linkAlphas,linkForces,linkTorques);
 
-    Eigen::Vector3d link1Force = robot.linkForces[0];
-    Eigen::Vector3d link2Force = robot.linkForces[1];
-    Eigen::Vector3d link3Force = robot.linkForces[2];
+    Eigen::Vector3d link1Force = linkForces[0];
+    Eigen::Vector3d link2Force = linkForces[1];
+    Eigen::Vector3d link3Force = linkForces[2];
     Eigen::Vector3d expectedLink1Force;
     expectedLink1Force << 0,21.9449,18.9731;
     Eigen::Vector3d expectedLink2Force;
@@ -208,7 +233,7 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
     ASSERT_TRUE(link2Force.isApprox(expectedLink2Force,.001));
     ASSERT_TRUE(link3Force.isApprox(expectedLink3Force,.001));
 }
-*/
+
 TEST(RoboticsUnitTest,WhenCalculatingGravityTorquesForPlanarRobot_JointTorquesAreCorrect)
 {
     PhysicsWorld world;
@@ -291,8 +316,6 @@ TEST(RoboticsUnitTest,WhenCalculatingMassMatrix_MassMatrixIsCorrect)
     expectedMassMatrix.row(1) << 3.4394, 2.3788, .6894;
     expectedMassMatrix.row(2) << 0.6894, .6894, .3358;
 
-    //std::cout<<actualMassMatrix.matrix()<<std::endl;
-
     ASSERT_TRUE(expectedMassMatrix.isApprox(actualMassMatrix,.001));
 }
 
@@ -320,31 +343,8 @@ TEST(RoboticsUnitTest,WhenCalculatingAccelerations_AccelerationsAreCorrect)
 
     ASSERT_TRUE(expectedAcceleration.isApprox(actualAcceleration,.001));
 }
-/*
-TEST(RoboticsUnitTest,WhenCalculatingAccelerationsForBaxterRobotInSeveralStates_AccelerationsAreCorrect)
-{
-    PhysicsWorld world;
-    int numLinks = 7;
 
-    PhysicsRobot robot = create_baxter_robot(&world);
 
-    Eigen::VectorXd q(numLinks);
-    Eigen::VectorXd qd(numLinks);
-    Eigen::VectorXd tau(numLinks);
-//    q << 0,0,0;
-//    qd << 0,0,0;
-//    tau << 0,0,0;
-
-    Eigen::VectorXd actualAcceleration = robot.get_accel(q,qd,tau,world.g);
-
-    Eigen::VectorXd expectedAcceleration(numLinks);
-//    expectedAcceleration << 0, 0, 0;
-
-    std::cout<<actualAcceleration<<std::endl;
-
-    ASSERT_TRUE(expectedAcceleration.isApprox(actualAcceleration,.001));
-}
-*/
 
 
 
