@@ -12,6 +12,12 @@ public:
     Eigen::Affine3d get_transform_from_base_to_link_end(int link_id);
     Eigen::Affine3d get_transform_from_base_to_link_CoM(int link_id);
     void set_joint_angles(Eigen::VectorXd q);
+
+    Eigen::MatrixXd get_mass_matrix(Eigen::VectorXd q);
+    Eigen::VectorXd get_accel(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd tau, Eigen::Vector3d g);
+    Eigen::VectorXd get_coriolis_torques(Eigen::VectorXd q, Eigen::VectorXd qd);
+    Eigen::VectorXd get_gravity_torques(Eigen::VectorXd q, Eigen::Vector3d g);
+
     Eigen::VectorXd get_joint_torques_RNE(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd, std::vector<Eigen::Vector3d> externalForces, std::vector<Eigen::Vector3d> externalTorques, Eigen::Vector3d g);
     void calculate_robot_velocities_and_accelerations(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd);
     void calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd, std::vector<Eigen::Vector3d> externalForces, std::vector<Eigen::Vector3d> externalTorques, Eigen::Vector3d g);

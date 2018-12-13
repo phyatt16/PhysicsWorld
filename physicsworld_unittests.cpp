@@ -273,6 +273,54 @@ TEST(RoboticsUnitTest,WhenCalculatingJointTorquesWithExternalForce_JointTorquesA
     ASSERT_TRUE(jointTorques.isApprox(expectedJointTorques,.001));
 }
 
+TEST(RoboticsUnitTest,WhenCalculatingMassMatrix_MassMatrixIsCorrect)
+{
+    PhysicsWorld world;
+    PhysicsRobot robot;
+
+    int numLinks{3};
+    robot = create_n_link_robot(&world, numLinks);
+
+    Eigen::VectorXd q(numLinks);
+    //q << 0,0,0;
+
+    Eigen::MatrixXd actualMassMatrix = robot.get_mass_matrix(q);
+
+    Eigen::MatrixXd expectedMassMatrix(numLinks,numLinks);
+    //expectedMassMatrix.row(0) << 0, 0, 0;
+    //expectedMassMatrix.row(1) << 0, 0, 0;
+    //expectedMassMatrix.row(2) << 0, 0, 0;
+
+    std::cout<<actualMassMatrix.matrix()<<std::endl;
+
+    ASSERT_TRUE(expectedMassMatrix.isApprox(actualMassMatrix,.001));
+}
+
+TEST(RoboticsUnitTest,WhenCalculatingAccelerations_AccelerationsAreCorrect)
+{
+    PhysicsWorld world;
+    PhysicsRobot robot;
+
+    int numLinks{3};
+    robot = create_n_link_robot(&world, numLinks);
+
+    Eigen::VectorXd q(numLinks);
+    Eigen::VectorXd qd(numLinks);
+    Eigen::VectorXd tau(numLinks);
+    q << 0,0,0;
+    qd << 0,0,0;
+    tau << 0,0,0;
+
+    Eigen::VectorXd actualAcceleration = robot.get_accel(q,qd,tau,world.g);
+
+    Eigen::VectorXd expectedAcceleration(numLinks);
+    expectedAcceleration << 0, 0, 0;
+
+    std::cout<<actualAcceleration<<std::endl;
+
+    ASSERT_TRUE(expectedAcceleration.isApprox(actualAcceleration,.001));
+}
+
 
 
 

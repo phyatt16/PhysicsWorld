@@ -1,5 +1,6 @@
 #include "physicsrobot.h"
 #include "physicsworld.h"
+#include "eigen3/Eigen/LU"
 
 PhysicsRobot::PhysicsRobot()
 {
@@ -36,6 +37,73 @@ void PhysicsRobot::set_joint_angles(Eigen::VectorXd q)
     {
         this->joints[i]->jointAngle = q(i);
     }
+}
+
+Eigen::VectorXd PhysicsRobot::get_accel(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd tau, Eigen::Vector3d g)
+{
+    return get_mass_matrix(q).inverse() * (tau - get_coriolis_torques(q,qd) - get_gravity_torques(q,g));
+}
+
+Eigen::MatrixXd PhysicsRobot::get_mass_matrix(Eigen::VectorXd q)
+{
+    Eigen::VectorXd qd = Eigen::VectorXd::Zero(numLinks);
+    Eigen::VectorXd qdd = Eigen::VectorXd::Zero(numLinks);
+    Eigen::Vector3d g = Eigen::VectorXd::Zero(3);
+
+    std::vector<Eigen::Vector3d> externalForces;
+    std::vector<Eigen::Vector3d> externalTorques;
+    for(int i{0}; i<numLinks; i++)
+    {
+        externalForces.push_back(Eigen::Vector3d::Zero());
+        externalTorques.push_back(Eigen::Vector3d::Zero());
+    }
+
+    Eigen::MatrixXd M(numLinks,numLinks);
+    for(int i{0}; i<numLinks; i++)
+    {
+        qdd(i) = 1;
+        M.col(i) = get_joint_torques_RNE(q,qd,qdd,externalForces,externalTorques,g);
+        qdd(i) = 0;
+    }
+    return M;
+}
+
+Eigen::VectorXd PhysicsRobot::get_coriolis_torques(Eigen::VectorXd q,Eigen::VectorXd qd)
+{
+    Eigen::VectorXd qdd = Eigen::VectorXd::Zero(numLinks);
+    Eigen::Vector3d g = Eigen::VectorXd::Zero(3);
+
+    std::vector<Eigen::Vector3d> externalForces;
+    std::vector<Eigen::Vector3d> externalTorques;
+    for(int i{0}; i<numLinks; i++)
+    {
+        externalForces.push_back(Eigen::Vector3d::Zero());
+        externalTorques.push_back(Eigen::Vector3d::Zero());
+    }
+
+    Eigen::VectorXd coriolisTorques(numLinks);
+    coriolisTorques = get_joint_torques_RNE(q,qd,qdd,externalForces,externalTorques,g);
+
+    return coriolisTorques;
+}
+
+Eigen::VectorXd PhysicsRobot::get_gravity_torques(Eigen::VectorXd q, Eigen::Vector3d g)
+{
+    Eigen::VectorXd qd = Eigen::VectorXd::Zero(numLinks);
+    Eigen::VectorXd qdd = Eigen::VectorXd::Zero(numLinks);
+
+    std::vector<Eigen::Vector3d> externalForces;
+    std::vector<Eigen::Vector3d> externalTorques;
+    for(int i{0}; i<numLinks; i++)
+    {
+        externalForces.push_back(Eigen::Vector3d::Zero());
+        externalTorques.push_back(Eigen::Vector3d::Zero());
+    }
+
+    Eigen::VectorXd gravityTorques(numLinks);
+    gravityTorques = get_joint_torques_RNE(q,qd,qdd,externalForces,externalTorques,g);
+
+    return gravityTorques;
 }
 
 
