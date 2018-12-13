@@ -28,9 +28,28 @@ void PhysicsWorld::add_object_to_world(PhysicsObject* object)
     mNumberOfObjects++;
 }
 
+void PhysicsWorld::add_robot_to_world(PhysicsRobot* robot)
+{
+    mRobots.push_back(robot);
+    mNumberOfRobots++;
+}
+
 
 void PhysicsWorld::simulate_one_timestep(double dt)
 {
+
+    for(int i{0}; i<mNumberOfRobots; i++)
+    {
+        Eigen::VectorXd tau(mRobots[i]->numLinks);
+        tau(i) = 0;
+
+        mRobots[i]->qdd = mRobots[i]->get_accel(mRobots[i]->q,mRobots[i]->qd,tau,g);
+        mRobots[i]->qd = mRobots[i]->qd + mRobots[i]->qdd*dt;
+        mRobots[i]->q = mRobots[i]->q + mRobots[i]->qd*dt;
+        std::cout<<"Simulating one timestep..."<<std::endl;
+    }
+
+    /*
     for(int i{0}; i<mNumberOfObjects; i++)
     {
         Eigen::Vector3d acceleration{g};
@@ -54,6 +73,6 @@ void PhysicsWorld::simulate_one_timestep(double dt)
             mObjects[i]->velocity = mObjects[i]->velocity*mObjects[i]->mCoefficientOfRestitution;
         }
         if(mObjects[i]->pose.translation()(2)<0){mObjects[i]->pose.translation()(2)=0;}
-
     }
+    */
 }

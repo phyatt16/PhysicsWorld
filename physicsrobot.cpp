@@ -268,15 +268,15 @@ PhysicsRobot create_n_link_robot(PhysicsWorld *world,int numLinks, double linkLe
     return robot;
 }
 
-PhysicsRobot create_baxter_robot(PhysicsWorld *world)
+PhysicsRobot* create_baxter_robot(PhysicsWorld *world)
 {
-    PhysicsRobot robot;
+    PhysicsRobot * robot = new PhysicsRobot;
 
     double height = .10;
     double radius = .075;
     double mass = 1;
     PhysicsCylinder *link0 = new PhysicsCylinder(height,radius,mass);
-    robot.base = link0;
+    robot->base = link0;
     world->add_object_to_world(link0);
 
     // Joint 1
@@ -286,13 +286,13 @@ PhysicsRobot create_baxter_robot(PhysicsWorld *world)
     PhysicsCylinder *link1 = new PhysicsCylinder(height,radius,mass);
     world->add_object_to_world(link1);
     PhysicsJoint * joint1 = new PhysicsJoint;
-    joint1->parent = robot.base;
+    joint1->parent = robot->base;
     joint1->child = link1;
     joint1->rotationAxis << 0, 0, 1;
     joint1->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,.05);
     joint1->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link1->height/2.0);
     joint1->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,link1->height);
-    robot.add_joint(joint1);
+    robot->add_joint(joint1);
 
     // Joint 2
     height = .001;
@@ -307,7 +307,7 @@ PhysicsRobot create_baxter_robot(PhysicsWorld *world)
     joint2->TransformFromParentCoMToJoint = joint1->TransformFromJointToChildCoM.inverse()*joint1->TransformFromJointToChildEnd*Eigen::AngleAxisd(3.14159/2.0,Eigen::Vector3d(0,1,0));
     joint2->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link2->height/2.0);
     joint2->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,link2->height);
-    robot.add_joint(joint2);
+    robot->add_joint(joint2);
 
     // Joint 3
     height = .36435;
@@ -322,7 +322,7 @@ PhysicsRobot create_baxter_robot(PhysicsWorld *world)
     joint3->TransformFromParentCoMToJoint = joint2->TransformFromJointToChildCoM.inverse()*joint2->TransformFromJointToChildEnd;
     joint3->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link3->height/2.0);
     joint3->TransformFromJointToChildEnd = Eigen::Translation3d(0.069,0,link3->height);
-    robot.add_joint(joint3);
+    robot->add_joint(joint3);
 
 
     // Joint 4
@@ -338,7 +338,7 @@ PhysicsRobot create_baxter_robot(PhysicsWorld *world)
     joint4->TransformFromParentCoMToJoint = joint3->TransformFromJointToChildCoM.inverse()*joint3->TransformFromJointToChildEnd;
     joint4->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link4->height/2.0);
     joint4->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,link4->height);
-    robot.add_joint(joint4);
+    robot->add_joint(joint4);
 
 
     // Joint 5
@@ -354,7 +354,7 @@ PhysicsRobot create_baxter_robot(PhysicsWorld *world)
     joint5->TransformFromParentCoMToJoint = joint4->TransformFromJointToChildCoM.inverse()*joint4->TransformFromJointToChildEnd;
     joint5->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link5->height/2.0);
     joint5->TransformFromJointToChildEnd = Eigen::Translation3d(.01,0,link5->height);
-    robot.add_joint(joint5);
+    robot->add_joint(joint5);
 
     // Joint 6
     height = .001;
@@ -369,7 +369,7 @@ PhysicsRobot create_baxter_robot(PhysicsWorld *world)
     joint6->TransformFromParentCoMToJoint = joint5->TransformFromJointToChildCoM.inverse()*joint5->TransformFromJointToChildEnd;
     joint6->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link6->height/2.0);
     joint6->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,link6->height);
-    robot.add_joint(joint6);
+    robot->add_joint(joint6);
 
 
     // Joint 7
@@ -385,7 +385,7 @@ PhysicsRobot create_baxter_robot(PhysicsWorld *world)
     joint7->TransformFromParentCoMToJoint = joint6->TransformFromJointToChildCoM.inverse()*joint6->TransformFromJointToChildEnd;
     joint7->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link7->height/2.0);
     joint7->TransformFromJointToChildEnd = Eigen::Translation3d(.01,0,link7->height);
-    robot.add_joint(joint7);
+    robot->add_joint(joint7);
 
     return robot;
 }

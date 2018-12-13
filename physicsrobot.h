@@ -1,6 +1,15 @@
 #ifndef PHYSICSROBOT_H
 #define PHYSICSROBOT_H
-#include "physicsworld.h"
+#include "physicssphere.h"
+#include "physicscylinder.h"
+#include "physicsbox.h"
+#include "physicsjoint.h"
+#include "physicsobject.h"
+#include <vector>
+//#include "physicsworld.h"
+
+class PhysicsWorld;
+
 
 class PhysicsRobot
 {
@@ -36,6 +45,6 @@ public:
 };
 
 PhysicsRobot create_n_link_robot(PhysicsWorld *world, int numLinks, double linkLengths=1.0);
-PhysicsRobot create_baxter_robot(PhysicsWorld *world);
+PhysicsRobot* create_baxter_robot(PhysicsWorld *world);
 
 #endif // PHYSICSROBOT_H
