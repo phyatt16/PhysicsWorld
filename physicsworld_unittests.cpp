@@ -84,19 +84,19 @@ TEST(RoboticsUnitTest,WhenPuttingJointsBetweenLinks_TheyReturnRelativeTransformB
 TEST(RoboticsUnitTest,WhenCreatingRobotAndGivingJointAngles_RobotCanDoForwardKinematicsToEndsOfLinks)
 {
     PhysicsWorld world;
-    PhysicsRobot robot;
+    PhysicsRobot *robot;
 
     int numLinks{2};
     robot = create_n_link_robot(&world, numLinks);
 
-    robot.joints[0]->jointAngle = 3.14159/2.0;
-    robot.joints[1]->jointAngle = 3.14159/2.0;
+    robot->joints[0]->jointAngle = 3.14159/2.0;
+    robot->joints[1]->jointAngle = 3.14159/2.0;
 
-    Eigen::Affine3d actualLink1EndPose = robot.get_transform_from_base_to_link_end(0);
-    Eigen::Affine3d actualRobotEEPose = robot.get_transform_from_base_to_link_end(1);
+    Eigen::Affine3d actualLink1EndPose = robot->get_transform_from_base_to_link_end(0);
+    Eigen::Affine3d actualRobotEEPose = robot->get_transform_from_base_to_link_end(1);
 
-    Eigen::Affine3d expectedLink1EndPose = Eigen::AngleAxisd(robot.joints[0]->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,0,1);
-    Eigen::Affine3d expectedRobotEEPose = Eigen::AngleAxisd(robot.joints[1]->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,0,1)*Eigen::AngleAxisd(robot.joints[0]->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,0,1);
+    Eigen::Affine3d expectedLink1EndPose = Eigen::AngleAxisd(robot->joints[0]->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,0,1);
+    Eigen::Affine3d expectedRobotEEPose = Eigen::AngleAxisd(robot->joints[1]->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,0,1)*Eigen::AngleAxisd(robot->joints[0]->jointAngle,Eigen::Vector3d(1,0,0))*Eigen::Translation3d(0,0,1);
 
     ASSERT_TRUE(actualLink1EndPose.isApprox(expectedLink1EndPose,.001));
     ASSERT_TRUE(actualRobotEEPose.isApprox(expectedRobotEEPose,.001));
@@ -106,24 +106,24 @@ TEST(RoboticsUnitTest,WhenCreatingRobotAndGivingJointAngles_RobotCanDoForwardKin
 TEST(RoboticsUnitTest,WhenCallingUpdateRobotKinematics_LinkObjectsHaveCorrectPoses)
 {
     PhysicsWorld world;
-    PhysicsRobot robot;
+    PhysicsRobot *robot;
 
     int numLinks{3};
     robot = create_n_link_robot(&world, numLinks);
 
-    robot.joints[0]->jointAngle = 3.14159/2.0;
-    robot.joints[1]->jointAngle = 3.14159/2.0;
-    robot.joints[2]->jointAngle = 3.14159/2.0;
+    robot->joints[0]->jointAngle = 3.14159/2.0;
+    robot->joints[1]->jointAngle = 3.14159/2.0;
+    robot->joints[2]->jointAngle = 3.14159/2.0;
 
-    robot.update_robot_kinematics();
+    robot->update_robot_kinematics();
 
-    Eigen::Affine3d actualLink1Pose = robot.joints[0]->child->pose;
+    Eigen::Affine3d actualLink1Pose = robot->joints[0]->child->pose;
     Eigen::Affine3d expectedLink1Pose = Eigen::Translation3d(0,-.5,0)*Eigen::AngleAxisd(3.14159/2.0,Eigen::Vector3d(1,0,0));
 
-    Eigen::Affine3d actualLink2Pose = robot.joints[1]->child->pose;
+    Eigen::Affine3d actualLink2Pose = robot->joints[1]->child->pose;
     Eigen::Affine3d expectedLink2Pose = Eigen::Translation3d(0,-1,-.5)*Eigen::AngleAxisd(3.14159,Eigen::Vector3d(1,0,0));
 
-    Eigen::Affine3d actualLink3Pose = robot.joints[2]->child->pose;
+    Eigen::Affine3d actualLink3Pose = robot->joints[2]->child->pose;
     Eigen::Affine3d expectedLink3Pose = Eigen::Translation3d(0,-.5,-1)*Eigen::AngleAxisd(3.14159*3.0/2,Eigen::Vector3d(1,0,0));
 
     ASSERT_TRUE(actualLink1Pose.isApprox(expectedLink1Pose,.001));
@@ -134,7 +134,7 @@ TEST(RoboticsUnitTest,WhenCallingUpdateRobotKinematics_LinkObjectsHaveCorrectPos
 TEST(RoboticsUnitTest,WhenCalculatingLinkAccelerations_LinkAccelerationsAreCorrect)
 {
     PhysicsWorld world;
-    PhysicsRobot robot;
+    PhysicsRobot *robot;
     int numLinks{3};
 
     std::vector<Eigen::Vector3d> linkCoMAccels;
@@ -161,7 +161,7 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkAccelerations_LinkAccelerationsAreCorre
     qd << 3.14159/6.0,-3.14159/4.0,3.14159/3.0;
     qdd << -3.14159/6.0,3.14159/3.0,3.14159/6.0;
 
-    robot.calculate_robot_velocities_and_accelerations(q,qd,qdd,linkCoMAccels,linkEndAccels,linkOmegas,linkAlphas);
+    robot->calculate_robot_velocities_and_accelerations(q,qd,qdd,linkCoMAccels,linkEndAccels,linkOmegas,linkAlphas);
 
     Eigen::Vector3d link1Accel = linkCoMAccels[0];
     Eigen::Vector3d link2Accel = linkCoMAccels[1];
@@ -181,7 +181,7 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkAccelerations_LinkAccelerationsAreCorre
 TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
 {
     PhysicsWorld world;
-    PhysicsRobot robot;
+    PhysicsRobot *robot;
 
     int numLinks{3};
     double linkLengths = 1;
@@ -207,7 +207,7 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
     qd << 3.14159/6.0,-3.14159/4.0,3.14159/3.0;
     qdd << -3.14159/6.0,3.14159/3.0,3.14159/6.0;
 
-    robot.calculate_robot_velocities_and_accelerations(q,qd,qdd,linkCoMAccels,linkEndAccels,linkOmegas,linkAlphas);
+    robot->calculate_robot_velocities_and_accelerations(q,qd,qdd,linkCoMAccels,linkEndAccels,linkOmegas,linkAlphas);
 
     std::vector<Eigen::Vector3d> externalForces;
     std::vector<Eigen::Vector3d> externalTorques;
@@ -217,7 +217,7 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
         externalTorques.push_back(Eigen::Vector3d::Zero());
     }
 
-    robot.calculate_robot_forces_and_torques(q,qd,qdd,externalForces,externalTorques,world.g,linkCoMAccels,linkOmegas,linkAlphas,linkForces,linkTorques);
+    robot->calculate_robot_forces_and_torques(q,qd,qdd,externalForces,externalTorques,world.g,linkCoMAccels,linkOmegas,linkAlphas,linkForces,linkTorques);
 
     Eigen::Vector3d link1Force = linkForces[0];
     Eigen::Vector3d link2Force = linkForces[1];
@@ -237,7 +237,7 @@ TEST(RoboticsUnitTest,WhenCalculatingLinkForces_LinkForcesAreCorrect)
 TEST(RoboticsUnitTest,WhenCalculatingGravityTorquesForPlanarRobot_JointTorquesAreCorrect)
 {
     PhysicsWorld world;
-    PhysicsRobot robot;
+    PhysicsRobot *robot;
 
     int numLinks{3};
     robot = create_n_link_robot(&world, numLinks);
@@ -257,7 +257,7 @@ TEST(RoboticsUnitTest,WhenCalculatingGravityTorquesForPlanarRobot_JointTorquesAr
         externalTorques.push_back(Eigen::Vector3d::Zero());
     }
 
-    Eigen::VectorXd jointTorques = robot.get_joint_torques_RNE(q,qd,qdd,externalForces,externalTorques,world.g);
+    Eigen::VectorXd jointTorques = robot->get_joint_torques_RNE(q,qd,qdd,externalForces,externalTorques,world.g);
     Eigen::VectorXd expectedJointTorques(numLinks);
     expectedJointTorques << -44.145,-19.62,-4.905;
 
@@ -267,7 +267,7 @@ TEST(RoboticsUnitTest,WhenCalculatingGravityTorquesForPlanarRobot_JointTorquesAr
 TEST(RoboticsUnitTest,WhenCalculatingJointTorquesWithExternalForce_JointTorquesAreCorrect)
 {
     PhysicsWorld world;
-    PhysicsRobot robot;
+    PhysicsRobot *robot;
 
     int numLinks{3};
     robot = create_n_link_robot(&world, numLinks);
@@ -291,7 +291,7 @@ TEST(RoboticsUnitTest,WhenCalculatingJointTorquesWithExternalForce_JointTorquesA
     externalForces[1] << 0,0,0;
     externalForces[2](2)=-1;
 
-    Eigen::VectorXd jointTorques = robot.get_joint_torques_RNE(q,qd,qdd,externalForces,externalTorques,world.g);
+    Eigen::VectorXd jointTorques = robot->get_joint_torques_RNE(q,qd,qdd,externalForces,externalTorques,world.g);
     Eigen::VectorXd expectedJointTorques(numLinks);
     expectedJointTorques << -47.145,-21.62,-5.905;
 
@@ -301,7 +301,7 @@ TEST(RoboticsUnitTest,WhenCalculatingJointTorquesWithExternalForce_JointTorquesA
 TEST(RoboticsUnitTest,WhenCalculatingMassMatrix_MassMatrixIsCorrect)
 {
     PhysicsWorld world;
-    PhysicsRobot robot;
+    PhysicsRobot *robot;
 
     int numLinks{3};
     robot = create_n_link_robot(&world, numLinks);
@@ -309,7 +309,7 @@ TEST(RoboticsUnitTest,WhenCalculatingMassMatrix_MassMatrixIsCorrect)
     Eigen::VectorXd q(numLinks);
     q << 3.14159/4.0,3.14159/4.0,3.14159/4.0;
 
-    Eigen::MatrixXd actualMassMatrix = robot.get_mass_matrix(q);
+    Eigen::MatrixXd actualMassMatrix = robot->get_mass_matrix(q);
 
     Eigen::MatrixXd expectedMassMatrix(numLinks,numLinks);
     expectedMassMatrix.row(0) << 6.8359, 3.4394, .6894;
@@ -322,7 +322,7 @@ TEST(RoboticsUnitTest,WhenCalculatingMassMatrix_MassMatrixIsCorrect)
 TEST(RoboticsUnitTest,WhenCalculatingAccelerations_AccelerationsAreCorrect)
 {
     PhysicsWorld world;
-    PhysicsRobot robot;
+    PhysicsRobot *robot;
 
     int numLinks{3};
     robot = create_n_link_robot(&world, numLinks);
@@ -334,7 +334,7 @@ TEST(RoboticsUnitTest,WhenCalculatingAccelerations_AccelerationsAreCorrect)
     qd << 0,0,0;
     tau << 0,0,0;
 
-    Eigen::VectorXd actualAcceleration = robot.get_accel(q,qd,tau,world.g);
+    Eigen::VectorXd actualAcceleration = robot->get_accel(q,qd,tau,world.g);
 
     Eigen::VectorXd expectedAcceleration(numLinks);
     expectedAcceleration << 0, 0, 0;

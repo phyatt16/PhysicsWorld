@@ -28,9 +28,10 @@ void PhysicsWorld::add_object_to_world(PhysicsObject* object)
     mNumberOfObjects++;
 }
 
-void PhysicsWorld::add_robot_to_world(PhysicsRobot* robot)
+void PhysicsWorld::add_robot_to_world(PhysicsRobot* robot, PhysicsPIDController* PID)
 {
     mRobots.push_back(robot);
+    mControllers.push_back(PID);
     mNumberOfRobots++;
 }
 

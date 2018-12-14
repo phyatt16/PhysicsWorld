@@ -44,7 +44,7 @@ public:
 
 };
 
-PhysicsRobot create_n_link_robot(PhysicsWorld *world, int numLinks, double linkLengths=1.0);
+PhysicsRobot* create_n_link_robot(PhysicsWorld *world, int numLinks, double linkLengths=1.0);
 PhysicsRobot* create_baxter_robot(PhysicsWorld *world);
 
 #endif // PHYSICSROBOT_H

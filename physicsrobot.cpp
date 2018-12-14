@@ -59,7 +59,7 @@ Eigen::MatrixXd PhysicsRobot::get_mass_matrix(Eigen::VectorXd q)
     }
 
     Eigen::MatrixXd M(numLinks,numLinks);
-    std::vector<std::thread> threads;
+//    std::vector<std::thread> threads;
     for(int i{0}; i<numLinks; i++)
     {
         qdd(i) = 1;
@@ -232,15 +232,15 @@ void PhysicsRobot::calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::
 }
 
 
-PhysicsRobot create_n_link_robot(PhysicsWorld *world,int numLinks, double linkLengths)
+PhysicsRobot* create_n_link_robot(PhysicsWorld *world,int numLinks, double linkLengths)
 {
-    PhysicsRobot robot;
+    PhysicsRobot * robot = new PhysicsRobot;
 
     PhysicsBox *box = new PhysicsBox;
     box->height = .1;
     box->length = .1;
     box->width = .1;
-    robot.base = box;
+    robot->base = box;
     world->add_object_to_world(box);
 
     for(int i{0}; i<numLinks; i++)
@@ -251,8 +251,8 @@ PhysicsRobot create_n_link_robot(PhysicsWorld *world,int numLinks, double linkLe
         PhysicsCylinder *cylinder = new PhysicsCylinder(height,radius,mass);
         world->add_object_to_world(cylinder);
         PhysicsJoint * joint = new PhysicsJoint;
-        if(i==0){joint->parent = robot.base;}
-        else{joint->parent = robot.joints[i-1]->child;}
+        if(i==0){joint->parent = robot->base;}
+        else{joint->parent = robot->joints[i-1]->child;}
 
         joint->child = cylinder;
         joint->rotationAxis << 1, 0, 0;
@@ -262,7 +262,7 @@ PhysicsRobot create_n_link_robot(PhysicsWorld *world,int numLinks, double linkLe
 
         joint->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,cylinder->height/2.0);
         joint->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,cylinder->height);
-        robot.add_joint(joint);
+        robot->add_joint(joint);
     }
 
     return robot;

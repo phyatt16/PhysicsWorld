@@ -26,6 +26,8 @@ add_library(${PROJECT_NAME} STATIC
     physicsjoint.h
     physicsrobot.cpp
     physicsrobot.h
+    physicspidcontroller.cpp
+    physicspidcontroller.h
     )
 
 add_executable(PhysicsWorld_UnitTest
