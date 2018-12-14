@@ -59,7 +59,7 @@ Eigen::MatrixXd PhysicsRobot::get_mass_matrix(Eigen::VectorXd q)
     }
 
     Eigen::MatrixXd M(numLinks,numLinks);
-//    std::vector<std::thread> threads;
+    //std::vector<std::thread> threads;
     for(int i{0}; i<numLinks; i++)
     {
         qdd(i) = 1;

@@ -20,7 +20,7 @@ public:
     void add_robot_to_world(PhysicsRobot* robot,PhysicsPIDController* PID);
 
     PhysicsObject * get_object(int objectId);
-    void simulate_one_timestep(double dt);
+    void simulate_one_timestep(double dt, bool gravityCompensation=false);
     std::vector<PhysicsObject *> mObjects;
     std::vector<PhysicsRobot *> mRobots;
     std::vector<PhysicsPIDController *> mControllers;
