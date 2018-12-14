@@ -44,9 +44,8 @@ void PhysicsWorld::simulate_one_timestep(double dt)
         tau(i) = 0;
 
         mRobots[i]->qdd = mRobots[i]->get_accel(mRobots[i]->q,mRobots[i]->qd,tau,g);
-        mRobots[i]->qd = mRobots[i]->qd + mRobots[i]->qdd*dt;
+        mRobots[i]->qd = -.001*mRobots[i]->qd + mRobots[i]->qd + mRobots[i]->qdd*dt;
         mRobots[i]->q = mRobots[i]->q + mRobots[i]->qd*dt;
-        std::cout<<"Simulating one timestep..."<<std::endl;
     }
 
     /*
