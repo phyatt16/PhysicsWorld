@@ -20,7 +20,6 @@ private:
     PhysicsRobot * mRobot;
 
     bool check_antiwindup_criteria(Eigen::VectorXd q, Eigen::VectorXd qd);
-
 };
 
 #endif // PHYSICSPIDCONTROLLER_H

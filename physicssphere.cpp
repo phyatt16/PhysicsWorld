@@ -1,5 +1,4 @@
 #include "physicssphere.h"
-#include <iostream>
 
 PhysicsSphere::PhysicsSphere(double sphereRadius, double sphereMass)
 {

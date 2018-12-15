@@ -8,9 +8,6 @@ public:
     PhysicsSphere(double radius,double mass);
     ~PhysicsSphere(){};
     double radius;
-
-private:
-
 };
 
 #endif // PHYSICSSPHERE_H

@@ -73,7 +73,6 @@ Eigen::MatrixXd PhysicsRobot::get_mass_matrix(Eigen::VectorXd q)
 //        threads[i].join();
 //    }
 
-
     return M;
 }
 
@@ -184,14 +183,11 @@ void PhysicsRobot::calculate_robot_velocities_and_accelerations(Eigen::VectorXd 
                          + linkAlphas[i].cross(joints[i]->TransformFromJointToChildCoM.translation())
                          + linkOmegas[i].cross(linkOmegas[i].cross(joints[i]->TransformFromJointToChildCoM.translation()));
 
-
         // ae_link_i = ae_link_i-1 + alpha_i x re + omega_i x (omega_i x re)
         linkEndAccels[i] = joints[i]->get_transform_from_parent_CoM_to_child_CoM().rotation().transpose()*linkEndAccels[i-1]
                          + linkAlphas[i].cross(joints[i]->TransformFromJointToChildEnd.translation())
                          + linkOmegas[i].cross(linkOmegas[i].cross(joints[i]->TransformFromJointToChildEnd.translation()));
-
     }
-
 }
 
 void PhysicsRobot::calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::VectorXd qd, Eigen::VectorXd qdd, std::vector<Eigen::Vector3d> externalForces, std::vector<Eigen::Vector3d> externalTorques, Eigen::Vector3d g, std::vector<Eigen::Vector3d> &linkCoMAccels, std::vector<Eigen::Vector3d> &linkOmegas, std::vector<Eigen::Vector3d> &linkAlphas, std::vector<Eigen::Vector3d> &linkForces, std::vector<Eigen::Vector3d> &linkTorques)
@@ -208,8 +204,6 @@ void PhysicsRobot::calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::
                    - (get_transform_from_base_to_link_CoM(numLinks-1).rotation().transpose()*externalForces[numLinks-1]).cross(joints[numLinks-1]->TransformFromJointToChildCoM.translation() - joints[numLinks-1]->TransformFromJointToChildEnd.translation())
                    + joints[numLinks-1]->child->inertiaTensor*linkAlphas[numLinks-1]
                    + linkOmegas[numLinks-1].cross(joints[numLinks-1]->child->inertiaTensor*linkOmegas[numLinks-1]);
-
-
 
     for(int i{numLinks-2}; i>=0; i--)
     {
@@ -228,7 +222,6 @@ void PhysicsRobot::calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::
                        + joints[i]->child->inertiaTensor*linkAlphas[i]
                        + linkOmegas[i].cross(joints[i]->child->inertiaTensor*linkOmegas[i]);
     }
-
 }
 
 PhysicsObject * get_link(double mass, double linkLengths, std::string shape, double linkWidth=.2)
@@ -264,9 +257,9 @@ PhysicsRobot* create_n_link_robot(PhysicsWorld *world,int numLinks, double linkL
     double height{.25};
     double width{.5};
     double mass{10};
-    PhysicsBox *box = new PhysicsBox(length,width,height,mass);
-    robot->base = box;
-    world->add_object_to_world(box);
+    PhysicsBox *robotBase = new PhysicsBox(length,width,height,mass);
+    robot->base = robotBase;
+    world->add_object_to_world(robotBase);
 
     for(int i{0}; i<numLinks; i++)
     {
@@ -355,7 +348,6 @@ PhysicsRobot* create_n_link_robot(PhysicsWorld *world,int numLinks, double linkL
             robot->add_joint(joint3);
         }
     }
-
     return robot;
 }
 

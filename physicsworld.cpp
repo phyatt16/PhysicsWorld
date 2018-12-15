@@ -1,5 +1,4 @@
 #include "physicsworld.h"
-#include <iostream>
 #include <math.h>
 
 PhysicsWorld::PhysicsWorld()
@@ -48,7 +47,7 @@ void PhysicsWorld::remove_robots_from_world()
 }
 
 
-void PhysicsWorld::simulate_one_timestep(double dt, bool gravityCompensation)
+void PhysicsWorld::simulate_one_timestep(double dt, bool gravityCompensation, double frictionLoss)
 {
     for(int i{0}; i<mNumberOfRobots; i++)
     {
@@ -68,8 +67,8 @@ void PhysicsWorld::simulate_one_timestep(double dt, bool gravityCompensation)
         }
         if(noNans)
         {
-            //Eigen::VectorXd qd = 0.99*mRobots[i]->qd + 0.5*(qdd + mRobots[i]->qdd)*dt;
-            Eigen::VectorXd qd = 0.99*mRobots[i]->qd + qdd*dt;
+            //Eigen::VectorXd qd = frictionLoss*mRobots[i]->qd + 0.5*(qdd + mRobots[i]->qdd)*dt;
+            Eigen::VectorXd qd = frictionLoss*mRobots[i]->qd + qdd*dt;
             mRobots[i]->qdd = qdd;
 
             //mRobots[i]->q = mRobots[i]->q + 0.5*(qd + mRobots[i]->qd)*dt;
@@ -78,37 +77,11 @@ void PhysicsWorld::simulate_one_timestep(double dt, bool gravityCompensation)
         }
         else
         {
-            Eigen::VectorXd qd = 0.99*mRobots[i]->qd;
+            Eigen::VectorXd qd = frictionLoss*mRobots[i]->qd;
 
             //mRobots[i]->q = mRobots[i]->q + 0.5*(qd + mRobots[i]->qd)*dt;
             mRobots[i]->q = mRobots[i]->q + qd*dt;
             mRobots[i]->qd = qd;
         }
     }
-    /*
-    for(int i{0}; i<mNumberOfObjects; i++)
-    {
-        Eigen::Vector3d acceleration{g};
-
-        if(!std::isnan(acceleration(0)) && !std::isnan(acceleration(1)) && !std::isnan(acceleration(2)))
-        {
-            mObjects[i]->velocity = mObjects[i]->velocity + acceleration*dt;
-        }
-        else
-        {
-            double velocityDampingTerm{.9};
-            mObjects[i]->velocity = mObjects[i]->velocity * velocityDampingTerm;
-        }
-
-        mObjects[i]->pose.translation() = mObjects[i]->pose.translation() + mObjects[i]->velocity*dt;
-
-
-        if(mObjects[i]->pose.translation()(2) <= 0)
-        {
-            mObjects[i]->velocity(2) = -mObjects[i]->velocity(2);
-            mObjects[i]->velocity = mObjects[i]->velocity*mObjects[i]->mCoefficientOfRestitution;
-        }
-        if(mObjects[i]->pose.translation()(2)<0){mObjects[i]->pose.translation()(2)=0;}
-    }
-    */
 }

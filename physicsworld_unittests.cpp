@@ -103,7 +103,7 @@ TEST(RoboticsUnitTest,WhenCreatingRobotAndGivingJointAngles_RobotCanDoForwardKin
 
 }
 
-TEST(RoboticsUnitTest,WhenCallingUpdateRobotKinematics_LinkObjectsHaveCorrectPoses)
+TEST(RoboticsUnitTest,WhenCallingUpdateRobotKinematics_AllLinkObjectsHaveCorrectPoses)
 {
     PhysicsWorld world;
     PhysicsRobot *robot;
@@ -325,16 +325,11 @@ TEST(RoboticsUnitTest,WhenCalculatingAccelerations_AccelerationsAreCorrect)
     Eigen::VectorXd q(numLinks);
     Eigen::VectorXd qd(numLinks);
     Eigen::VectorXd tau(numLinks);
-    q << 0,0,0;
-    qd << 0,0,0;
-    tau << 0,0,0;
 
     Eigen::VectorXd actualAcceleration = robot->get_accel(q,qd,tau,world.g);
 
     Eigen::VectorXd expectedAcceleration(numLinks);
     expectedAcceleration << 0, 0, 0;
-
-    std::cout<<actualAcceleration<<std::endl;
 
     ASSERT_TRUE(expectedAcceleration.isApprox(actualAcceleration,.001));
 }
