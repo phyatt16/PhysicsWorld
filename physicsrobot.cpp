@@ -231,73 +231,48 @@ void PhysicsRobot::calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::
 
 }
 
-
-PhysicsRobot* create_n_link_robot(PhysicsWorld *world,int numLinks, double linkLengths, std::string shape)
+PhysicsObject * get_link(double mass, double linkLengths, std::string shape)
 {
-    PhysicsRobot * robot = new PhysicsRobot;
-
-    double length{.1};
-    double height{.1};
-    double width{.1};
-    double mass{10};
-    PhysicsBox *box = new PhysicsBox(length,height,width,mass);
-    robot->base = box;
-    world->add_object_to_world(box);
-
     if(shape=="cylinder")
     {
-        for(int i{0}; i<numLinks; i++)
-        {
-            double height = linkLengths;
-            double radius = .1;
-            PhysicsCylinder *cylinder = new PhysicsCylinder(height,radius,mass);
-            world->add_object_to_world(cylinder);
-            PhysicsJoint * joint = new PhysicsJoint;
-            if(i==0){joint->parent = robot->base;}
-            else{joint->parent = robot->joints[i-1]->child;}
-
-            joint->child = cylinder;
-            joint->rotationAxis << 0, 1, 0;
-
-            if(i==0){joint->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,0);}
-            else{joint->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,cylinder->height/2.0);}
-
-            joint->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,cylinder->height/2.0);
-            joint->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,cylinder->height);
-            robot->add_joint(joint);
-        }
+        double height = linkLengths;
+        double radius = .1;
+        PhysicsCylinder *cylinder = new PhysicsCylinder(height,radius,mass);
+        return cylinder;
     }
     if(shape=="sphere")
     {
-        for(int i{0}; i<numLinks; i++)
-        {
-            double radius = linkLengths;
-            PhysicsSphere *link = new PhysicsSphere(radius,mass);
-            world->add_object_to_world(link);
-            PhysicsJoint * joint = new PhysicsJoint;
-            if(i==0){joint->parent = robot->base;}
-            else{joint->parent = robot->joints[i-1]->child;}
-
-            joint->child = link;
-            joint->rotationAxis << 0, 1, 0;
-
-            if(i==0){joint->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,0);}
-            else{joint->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,link->radius);}
-
-            joint->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link->radius);
-            joint->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,link->radius*2.0);
-            robot->add_joint(joint);
-        }
+        double radius = linkLengths/2.0;
+        PhysicsSphere *sphere = new PhysicsSphere(radius,mass);
+        return sphere;
     }
     if(shape=="box")
     {
-        for(int i{0}; i<numLinks; i++)
-        {
-            double height = linkLengths;
-            double length = .2;
-            double width = .2;
+        double height = linkLengths;
+        double length = .2;
+        double width = .2;
+        PhysicsBox *box = new PhysicsBox(length,width,height,mass);
+        return box;
+    }
+}
 
-            PhysicsBox *link = new PhysicsBox(length,width,height,mass);
+PhysicsRobot* create_n_link_robot(PhysicsWorld *world,int numLinks, double linkLengths, int numDofPerLink, std::string shape)
+{
+    PhysicsRobot * robot = new PhysicsRobot;
+
+    double length{.5};
+    double height{.25};
+    double width{.5};
+    double mass{10};
+    PhysicsBox *box = new PhysicsBox(length,width,height,mass);
+    robot->base = box;
+    world->add_object_to_world(box);
+
+    for(int i{0}; i<numLinks; i++)
+    {
+        if(numDofPerLink==1)
+        {
+            PhysicsObject * link = get_link(mass,linkLengths,shape);
             world->add_object_to_world(link);
             PhysicsJoint * joint = new PhysicsJoint;
             if(i==0){joint->parent = robot->base;}
@@ -307,15 +282,79 @@ PhysicsRobot* create_n_link_robot(PhysicsWorld *world,int numLinks, double linkL
             joint->rotationAxis << 0, 1, 0;
 
             if(i==0){joint->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,0);}
-            else{joint->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,link->height/2.0);}
-
-            joint->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,link->height/2.0);
-            joint->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,link->height);
+            else{joint->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,linkLengths/2.0);}
+            joint->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,linkLengths/2.0);
+            joint->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,linkLengths);
             robot->add_joint(joint);
         }
+        if(numDofPerLink==2)
+        {
+            PhysicsObject * link1 = get_link(0,.3,"sphere");
+            world->add_object_to_world(link1);
+            PhysicsJoint * joint1 = new PhysicsJoint;
+            if(i==0){joint1->parent = robot->base;}
+            else{joint1->parent = robot->joints[2*i-1]->child;}
+
+            joint1->child = link1;
+            joint1->rotationAxis << 1, 0, 0;
+
+            if(i==0){joint1->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,0);}
+            else{joint1->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,linkLengths/2.0);}
+            joint1->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,0);
+            joint1->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,0);
+            robot->add_joint(joint1);
+
+            PhysicsObject * link2 = get_link(mass,linkLengths,shape);
+            world->add_object_to_world(link2);
+            PhysicsJoint * joint2 = new PhysicsJoint;
+            joint2->parent = joint1->child;
+
+            joint2->child = link2;
+            joint2->rotationAxis << 0, 1, 0;
+
+            joint2->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,0);
+            joint2->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,linkLengths/2.0);
+            joint2->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,linkLengths);
+            robot->add_joint(joint2);
+        }
+        if(numDofPerLink==3)
+        {
+            PhysicsObject * link1 = get_link(0,0,"sphere");
+            world->add_object_to_world(link1);
+            PhysicsJoint * joint1 = new PhysicsJoint;
+            if(i==0){joint1->parent = robot->base;}
+            else{joint1->parent = robot->joints[3*i-1]->child;}
+            joint1->child = link1;
+            joint1->rotationAxis << 1, 0, 0;
+            if(i==0){joint1->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,0);}
+            else{joint1->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,linkLengths/2.0);}
+            joint1->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,0);
+            joint1->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,0);
+            robot->add_joint(joint1);
+
+            PhysicsObject * link2 = get_link(0,0,"sphere");
+            world->add_object_to_world(link2);
+            PhysicsJoint * joint2 = new PhysicsJoint;
+            joint2->parent = link1;
+            joint2->child = link2;
+            joint2->rotationAxis << 0, 1, 0;
+            joint2->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,0);
+            joint2->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,0);
+            joint2->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,0);
+            robot->add_joint(joint2);
+
+            PhysicsObject * link3 = get_link(mass,linkLengths,shape);
+            world->add_object_to_world(link3);
+            PhysicsJoint * joint3 = new PhysicsJoint;
+            joint3->parent = link2;
+            joint3->child = link3;
+            joint3->rotationAxis << 0, 0, 1;
+            joint3->TransformFromParentCoMToJoint = Eigen::Translation3d(0,0,0);
+            joint3->TransformFromJointToChildCoM = Eigen::Translation3d(0,0,linkLengths/2.0);
+            joint3->TransformFromJointToChildEnd = Eigen::Translation3d(0,0,linkLengths);
+            robot->add_joint(joint3);
+        }
     }
-
-
 
     return robot;
 }
