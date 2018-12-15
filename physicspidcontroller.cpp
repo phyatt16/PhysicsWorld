@@ -4,9 +4,9 @@ PhysicsPIDController::PhysicsPIDController(PhysicsRobot * robot)
 {
     mRobot = robot;
     qGoal = Eigen::VectorXd::Zero(mRobot->numLinks);
-    Kp = Eigen::MatrixXd::Identity(mRobot->numLinks,mRobot->numLinks)*10.0;
-    Ki = Eigen::MatrixXd::Identity(mRobot->numLinks,mRobot->numLinks)*0;
-    Kd = Eigen::MatrixXd::Identity(mRobot->numLinks,mRobot->numLinks);
+    Kp = Eigen::MatrixXd::Identity(mRobot->numLinks,mRobot->numLinks)*0.0;
+    Ki = Eigen::MatrixXd::Identity(mRobot->numLinks,mRobot->numLinks)*0.0;
+    Kd = Eigen::MatrixXd::Identity(mRobot->numLinks,mRobot->numLinks)*0.0;
     integratedError = Eigen::VectorXd::Zero(mRobot->numLinks);
 }
 

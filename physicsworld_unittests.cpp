@@ -16,16 +16,16 @@ TEST(PhysicsWorldUnitTest,WhenAddingDifferentObjects_TheyRetainTheirUniqueProper
 {
     PhysicsWorld world;
 
-    PhysicsSphere *sphere = new PhysicsSphere;
-    sphere->radius = 2;
+    double radius{2};
+    double mass{1};
+    PhysicsSphere *sphere = new PhysicsSphere(radius,mass);
     double height = 1.5;
-    double radius = .1;
-    double mass = 1;
+    radius = .1;
     PhysicsCylinder *cylinder = new PhysicsCylinder(height, radius, mass);
-    PhysicsBox *box = new PhysicsBox;
-    box->length = 3;
-    box->height = 4;
-    box->width = 5;
+    double length = 3;
+    double width = 5;
+    height = 4;
+    PhysicsBox *box = new PhysicsBox(length,width,height,mass);
 
     world.add_object_to_world(sphere);
     world.add_object_to_world(cylinder);

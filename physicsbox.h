@@ -5,7 +5,7 @@
 class PhysicsBox : public PhysicsObject
 {
 public:
-    PhysicsBox();
+    PhysicsBox(double, double, double, double);
     ~PhysicsBox(){};
     double length;
     double width;

@@ -5,9 +5,9 @@
 class PhysicsSphere : public PhysicsObject
 {
 public:
-    PhysicsSphere();
+    PhysicsSphere(double radius,double mass);
     ~PhysicsSphere(){};
-    double radius{0};
+    double radius;
 
 private:
 

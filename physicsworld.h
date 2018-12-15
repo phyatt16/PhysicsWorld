@@ -18,6 +18,7 @@ public:
     int get_number_of_objects();
     void add_object_to_world(PhysicsObject*);
     void add_robot_to_world(PhysicsRobot* robot,PhysicsPIDController* PID);
+    void remove_robots_from_world();
 
     PhysicsObject * get_object(int objectId);
     void simulate_one_timestep(double dt, bool gravityCompensation=false);

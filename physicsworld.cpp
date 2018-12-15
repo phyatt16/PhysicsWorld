@@ -35,6 +35,18 @@ void PhysicsWorld::add_robot_to_world(PhysicsRobot* robot, PhysicsPIDController*
     mNumberOfRobots++;
 }
 
+void PhysicsWorld::remove_robots_from_world()
+{
+    for(int i{0}; i<mNumberOfRobots; i++)
+    {
+        delete mRobots[i];
+        delete mControllers[i];
+    }
+    mRobots.clear();
+    mControllers.clear();
+    mNumberOfRobots=0;
+}
+
 
 void PhysicsWorld::simulate_one_timestep(double dt, bool gravityCompensation)
 {
@@ -51,22 +63,24 @@ void PhysicsWorld::simulate_one_timestep(double dt, bool gravityCompensation)
         for(int j{0}; j<mRobots[i]->numLinks; j++)
         {
             if(std::isnan(qdd(i))){noNans=false;}
-            if(qdd(i)>10){qdd(i)=10;}
-            if(qdd(i)<-10){qdd(i)=-10;}
+//            if(qdd(i)>100){qdd(i)=100;}
+//            if(qdd(i)<-100){qdd(i)=-100;}
         }
         if(noNans)
         {
-            Eigen::VectorXd qd = .99*mRobots[i]->qd + 0.5*(qdd + mRobots[i]->qdd)*dt;
+            Eigen::VectorXd qd = 0.99*mRobots[i]->qd + 0.5*(qdd + mRobots[i]->qdd)*dt;
             mRobots[i]->qdd = qdd;
 
-            mRobots[i]->q = mRobots[i]->q + 0.5*(qd + mRobots[i]->qd)*dt;
+            //mRobots[i]->q = mRobots[i]->q + 0.5*(qd + mRobots[i]->qd)*dt;
+            mRobots[i]->q = mRobots[i]->q + qd*dt;
             mRobots[i]->qd = qd;
         }
         else
         {
-            Eigen::VectorXd qd = .99*mRobots[i]->qd;
+            Eigen::VectorXd qd = 0.99*mRobots[i]->qd;
 
-            mRobots[i]->q = mRobots[i]->q + 0.5*(qd + mRobots[i]->qd)*dt;
+            //mRobots[i]->q = mRobots[i]->q + 0.5*(qd + mRobots[i]->qd)*dt;
+            mRobots[i]->q = mRobots[i]->q + qd*dt;
             mRobots[i]->qd = qd;
         }
     }
