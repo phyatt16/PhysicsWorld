@@ -231,12 +231,12 @@ void PhysicsRobot::calculate_robot_forces_and_torques(Eigen::VectorXd q, Eigen::
 
 }
 
-PhysicsObject * get_link(double mass, double linkLengths, std::string shape)
+PhysicsObject * get_link(double mass, double linkLengths, std::string shape, double linkWidth=.2)
 {
     if(shape=="cylinder")
     {
         double height = linkLengths;
-        double radius = .1;
+        double radius = linkWidth/2.0;
         PhysicsCylinder *cylinder = new PhysicsCylinder(height,radius,mass);
         return cylinder;
     }
@@ -249,8 +249,8 @@ PhysicsObject * get_link(double mass, double linkLengths, std::string shape)
     if(shape=="box")
     {
         double height = linkLengths;
-        double length = .2;
-        double width = .2;
+        double length = linkWidth;
+        double width = linkWidth;
         PhysicsBox *box = new PhysicsBox(length,width,height,mass);
         return box;
     }

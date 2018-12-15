@@ -62,13 +62,14 @@ void PhysicsWorld::simulate_one_timestep(double dt, bool gravityCompensation)
         bool noNans{true};
         for(int j{0}; j<mRobots[i]->numLinks; j++)
         {
-            if(std::isnan(qdd(i))){noNans=false;}
-//            if(qdd(i)>100){qdd(i)=100;}
-//            if(qdd(i)<-100){qdd(i)=-100;}
+            if(std::isnan(qdd(j))){noNans=false;}
+            if(qdd(j)>100.0){qdd(j)=100.0;}
+            if(qdd(j)<-100.0){qdd(j)=-100.0;}
         }
         if(noNans)
         {
-            Eigen::VectorXd qd = 0.99*mRobots[i]->qd + 0.5*(qdd + mRobots[i]->qdd)*dt;
+            //Eigen::VectorXd qd = 0.99*mRobots[i]->qd + 0.5*(qdd + mRobots[i]->qdd)*dt;
+            Eigen::VectorXd qd = 0.99*mRobots[i]->qd + qdd*dt;
             mRobots[i]->qdd = qdd;
 
             //mRobots[i]->q = mRobots[i]->q + 0.5*(qd + mRobots[i]->qd)*dt;
